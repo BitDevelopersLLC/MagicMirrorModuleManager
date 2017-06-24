@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MMMM</title>
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <style>
+  #sortable1, #sortable2, #sortable3 {
+    border: 1px solid #eee;
+    width: 142px;
+    min-height: 20px;
+    list-style-type: none;
+    margin: 0;
+    padding: 5px 0 0 0;
+    float: left;
+    margin-right: 10px;
+  }
+  #sortable1 li, #sortable2 li, #sortable3 li {
+    margin: 0 5px 5px 5px;
+    padding: 5px;
+    font-size: 1.2em;
+    width: 120px;
+  }
+  </style>
+  <script src="http://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="http://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script>
+  $( function() {
+    $( "#sortable1, #sortable2, #sortable3" ).sortable({
+      connectWith: ".connectedSortable"
+    }).disableSelection();
+  } );
+  </script>
+</head>
+<body>
+ 
+
+<ul id="sortable1" class="connectedSortable">
+  <h3 align="center"> Active </h3>
+  <li style="cursor:pointer" onclick="sortClick()"class="ui-state-default">Clock</li>
+  <li style="cursor:pointer" onclick="window.location='index.html'" class="ui-state-default">Calendar</li>
+  <li style="cursor:pointer" onclick="window.location='index.html'" class="ui-state-default">Weather</li>
+  <li style="cursor:pointer" onclick="window.location='index.html'" class="ui-state-default">Alarm Clock</li>
+</ul>
+ 
+<ul id="sortable2" class="connectedSortable">
+	<h3 align="center">Inactive</h3>
+</ul>
+
+<ul id="sortable3" class="connectedSortable">
+	<h3 align="center">Module Config</h3>
+</ul>
+ 
+ <script>
+  	function sortClick() {
+		var sortableItems = $('#sortable1').find('li');
+		
+		var order = ['Calendar', 'Clock', 'Alarm Clock', 'Weather'];
+		
+		var orderedItems = $.map(order, function(value) {
+			return sortableItems.get(value);
+		});
+		
+		$('#sortable1').empty().html(order);
+	}
+ </script>
+ 
+ <!--
+<form action="/github_upload.php">
+	<br></br><br></br>
+	<h3> Add New Module: </h3>
+	<input type="text" placeholder="Module's GitHub URL"></input>
+	<input type="submit" value="Submit">
+</form>
+ -->
+ 
+ 
+</body>
+</html>
