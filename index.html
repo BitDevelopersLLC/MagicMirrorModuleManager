@@ -1,11 +1,12 @@
 <!doctype html>
-<html lang="en">
+<html class="mdc-typography" lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MMMM</title>
   <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-  <link rel="stylesheet" href="/resources/demos/style.css">
+  <link rel="stylesheet" href="node_modules/material-components-web/dist/material-components-web.css"> </link>
+  
   <style>
   #sortable1, #sortable2, #sortable3 {
     border: 1px solid #eee;
@@ -24,6 +25,7 @@
     width: 120px;
   }
   </style>
+  
   <script src="http://code.jquery.com/jquery-1.12.4.js"></script>
   <script src="http://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   <script>
@@ -33,18 +35,42 @@
     }).disableSelection();
   } );
   </script>
-</head>
+  
 <body>
  
 
-<ul id="sortable1" class="connectedSortable">
+<ul id="sortable1" class="mdc-list">
   <h3 align="center"> Active </h3>
-  <li style="cursor:pointer" onclick="sortClick()"class="ui-state-default">Clock</li>
-  <li style="cursor:pointer" onclick="window.location='index.html'" class="ui-state-default">Calendar</li>
-  <li style="cursor:pointer" onclick="window.location='index.html'" class="ui-state-default">Weather</li>
-  <li style="cursor:pointer" onclick="window.location='index.html'" class="ui-state-default">Alarm Clock</li>
+  <li style="cursor:pointer" onclick="sortClick()" class="ui-state-default" class="mdc-list-item" >Clock</li>
+  <li style="cursor:pointer" onclick="window.location='index.html'" class="mdc-list-item" >Calendar</li>
+  <li style="cursor:pointer" onclick="window.location='index.html'" class="mdc-list-item" >Weather</li>
+  <li style="cursor:pointer" onclick="window.location='index.html'"  class="mdc-list-item" >Alarm Clock</li>
 </ul>
- 
+
+<nav class="mdc-list">
+    <a href="/wifi" class="mdc-list-item" data-mdc-auto-init="MDCRipple">
+        <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">
+            network_wifi
+        </i>
+        Wi-Fi
+    </a>
+    <a href="/bluetooth" class="mdc-list-item" data-mdc-auto-init="MDCRipple">
+        <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">
+            bluetooth
+        </i>
+        Bluetooth
+    </a>
+    <a href="/data-usage" class="mdc-list-item" data-mdc-auto-init="MDCRipple">
+        <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">
+            data_usage
+        </i>
+        Data Usage
+    </a>
+</nav>
+<script>
+    mdc.autoInit();
+    </script>
+
 <ul id="sortable2" class="connectedSortable">
 	<h3 align="center">Inactive</h3>
 </ul>
