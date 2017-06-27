@@ -10,6 +10,25 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
   <style>
+  .demo-card-wide.mdl-card {
+    width: 512px;
+  }
+  .demo-card-wide > .mdl-card__title {
+    color: #fff;
+    height: 176px;
+    background: url('images/background.jpg') center / cover;
+  }
+  .demo-card-wide > .mdl-card__menu {
+    color: #fff;
+  }
+
+  .demo-list-control {
+    width: 300px;
+  }
+  .demo-list-radio {
+    display: inline;
+  }
+
   #sortable1, #sortable2, #sortable3 {
     border: 1px solid #eee;
     width: 200px;
@@ -37,73 +56,204 @@
   } );
   </script>
 </head>
+
 <body>
 
+<!-- Start Main Grid -->
+  <main class="mdl-layout__content mdl-color--grey-100">
+    <div class="mdl-grid demo-content">
 
-<ul id="sortable1" class="connectedSortable">
-  <h3 align="center"> Active </h3>
-</ul>
+      <ul id="sortable1" class="connectedSortable mdl-shadow--2dp">
+        <h3 align="center">Modules</h3>
+      </ul>
 
-<ul id="sortable2" class="connectedSortable">
-	<h3 align="center">Inactive</h3>
-</ul>
+      <div class="demo-card mdl-card mdl-shadow--2dp">
+        <div class="mdl-card__title">
+          <h2 class="mdl-card__title-text">Config</h2>
+        </div>
 
-<ul id="sortable3" class="connectedSortable">
-	<h3 align="center">Module Config</h3>
-</ul>
+        <ul class="demo-list-control mdl-list">
+          <li class="mdl-list__item">
+            <span class="mdl-list__item-primary-content">
+              <i class="material-icons  mdl-list__item-icon">chrome_reader_mode</i>
+              Enabled
+            </span>
+            <span class="mdl-list__item-secondary-action">
+              <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="list-switch-1">
+                <input type="checkbox" id="list-switch-1" class="mdl-switch__input" checked />
+              </label>
+            </span>
+          </li>
+          <li class="mdl-list__item">
+            <span class="mdl-list__item-primary-content">
+              <i class="material-icons  mdl-list__item-icon">chrome_reader_mode</i>
+              Aaron Paul
+            </span>
+            <span class="mdl-list__item-secondary-action">
+              <label class="demo-list-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-1">
+                <input type="radio" id="list-option-1" class="mdl-radio__button" name="options" value="1" checked />
+              </label>
+            </span>
+          </li>
+        </ul>
 
-<style>
-.demo-card-wide.mdl-card {
-  width: 512px;
-}
-.demo-card-wide > .mdl-card__title {
-  color: #fff;
-  height: 176px;
-  background: url('../assets/demos/welcome_card.jpg') center / cover;
-}
-.demo-card-wide > .mdl-card__menu {
-  color: #fff;
-}
-</style>
+        <div class="mdl-card__actions mdl-card--border">
+          <div class="mdl-card__title">
+            <h3 class="mdl-card__title-text">Position</h3>
+          </div>
+          <ul id="positionList" class="demo-list-control mdl-list">
+            <li class="mdl-list__item">
+              <span class="mdl-list__item-primary-content">
+                <i class="material-icons  mdl-list__item-icon">my_location</i>
+                Aaron Paul
+              </span>
+              <span class="mdl-list__item-secondary-action">
+                <label class="demo-list-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-1">
+                  <input type="radio" id="list-option-1" class="mdl-radio__button" name="options" value="1" checked />
+                </label>
+              </span>
+            </li>
+            <li class="mdl-list__item">
+              <span class="mdl-list__item-primary-content">
+                <i class="material-icons  mdl-list__item-icon">my_location</i>
+                Aaron Paul
+              </span>
+              <span class="mdl-list__item-secondary-action">
+                <label class="demo-list-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-1">
+                  <input type="radio" id="list-option-1" class="mdl-radio__button" name="options" value="1" checked />
+                </label>
+              </span>
+            </li>
+            <li class="mdl-list__item">
+              <span class="mdl-list__item-primary-content">
+                <i class="material-icons  mdl-list__item-icon">my_location</i>
+                Aaron Paul
+              </span>
+              <span class="mdl-list__item-secondary-action">
+                <label class="demo-list-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-1">
+                  <input type="radio" id="list-option-1" class="mdl-radio__button" name="options" value="1" checked />
+                </label>
+              </span>
+            </li>
+            <li class="mdl-list__item">
+              <span class="mdl-list__item-primary-content">
+                <i class="material-icons  mdl-list__item-icon">my_location</i>
+                Aaron Paul
+              </span>
+              <span class="mdl-list__item-secondary-action">
+                <label class="demo-list-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-1">
+                  <input type="radio" id="list-option-1" class="mdl-radio__button" name="options" value="1" checked />
+                </label>
+              </span>
+            </li>
+            <li class="mdl-list__item">
+              <span class="mdl-list__item-primary-content">
+                <i class="material-icons  mdl-list__item-icon">my_location</i>
+                Aaron Paul
+              </span>
+              <span class="mdl-list__item-secondary-action">
+                <label class="demo-list-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-1">
+                  <input type="radio" id="list-option-1" class="mdl-radio__button" name="options" value="1" checked />
+                </label>
+              </span>
+            </li>
+            <li class="mdl-list__item">
+              <span class="mdl-list__item-primary-content">
+                <i class="material-icons  mdl-list__item-icon">my_location</i>
+                Aaron Paul
+              </span>
+              <span class="mdl-list__item-secondary-action">
+                <label class="demo-list-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-1">
+                  <input type="radio" id="list-option-1" class="mdl-radio__button" name="options" value="1" checked />
+                </label>
+              </span>
+            </li>
+            <li class="mdl-list__item">
+              <span class="mdl-list__item-primary-content">
+                <i class="material-icons  mdl-list__item-icon">my_location</i>
+                Aaron Paul
+              </span>
+              <span class="mdl-list__item-secondary-action">
+                <label class="demo-list-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-1">
+                  <input type="radio" id="list-option-1" class="mdl-radio__button" name="options" value="1" checked />
+                </label>
+              </span>
+            </li>
+            <li class="mdl-list__item">
+              <span class="mdl-list__item-primary-content">
+                <i class="material-icons  mdl-list__item-icon">my_location</i>
+                Aaron Paul
+              </span>
+              <span class="mdl-list__item-secondary-action">
+                <label class="demo-list-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-1">
+                  <input type="radio" id="list-option-1" class="mdl-radio__button" name="options" value="1" checked />
+                </label>
+              </span>
+            </li>
+            <li class="mdl-list__item">
+              <span class="mdl-list__item-primary-content">
+                <i class="material-icons  mdl-list__item-icon">my_location</i>
+                Aaron Paul
+              </span>
+              <span class="mdl-list__item-secondary-action">
+                <label class="demo-list-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-1">
+                  <input type="radio" id="list-option-1" class="mdl-radio__button" name="options" value="1" checked />
+                </label>
+              </span>
+            </li>
+            <li class="mdl-list__item">
+              <span class="mdl-list__item-primary-content">
+                <i class="material-icons  mdl-list__item-icon">my_location</i>
+                Aaron Paul
+              </span>
+              <span class="mdl-list__item-secondary-action">
+                <label class="demo-list-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-1">
+                  <input type="radio" id="list-option-1" class="mdl-radio__button" name="options" value="1" checked />
+                </label>
+              </span>
+            </li>
+          </ul>
+          </div>
 
-<div class="demo-card-wide mdl-card mdl-shadow--2dp">
-  <div class="mdl-card__title">
-    <h2 class="mdl-card__title-text">Welcome</h2>
-  </div>
-  <div class="mdl-card__supporting-text">
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-    Mauris sagittis pellentesque lacus eleifend lacinia...
-  </div>
-  <div class="mdl-card__actions mdl-card--border">
-    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
-      Get Started
-    </a>
-  </div>
-  <div class="mdl-card__menu">
-    <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
-      <i class="material-icons">share</i>
-    </button>
-  </div>
-</div>
+          <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+            Update
+          </a>
+        </div>
+        <div class="mdl-card__menu">
+          <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+            <i class="material-icons">share</i>
+          </button>
+        </div>
+      </div>
+
+
+
+
+    </div>
+  </main>
 
 
 <script src="config.js"></script>
 
 <script>
-var rawModules = config.modules;
-var arrayModules = [];
+  var rawModules = config.modules;
+  var arrayModules = [];
 
-function appendModules() {
-  var buttonWidthSync = "180px";
   var ul = document.getElementById("sortable1");
 
+function appendModules() {
+
+  // Sortable 1 Variable list
+  var buttonWidthSync = "180px";
   var arryNumber = -1;
+
+
   for (mod in rawModules) {
     var li = document.createElement("li");
     var btn = document.createElement("button");
     li.appendChild(btn);
     li.className = "ui-state-default";
-    li.className = "mdl-button mdl-button--raised mdl-button--accent";
+    li.className = "mdl-button mdl-button--raised mdl-button--colored";
     li.innerHTML = rawModules[mod].module;
     li.style = "cursor:pointer";
     li.style.fontSize = "1.3vw";
@@ -122,33 +272,39 @@ function appendModules() {
   });
 }
 
+  function findModule(name) {
+    for (mod in rawModules) {
+      if (rawModules[mod].module == name) {
+          console.info(rawModules[mod]);
+          return;
+        }
+      }
+    }
 
-function findModule(name) {
-  for (mod in rawModules) {
-    if (rawModules[mod].module == name) {
-        console.info(rawModules[mod]);
-      return;
+  function parseModule(mod) {
+    if (mod.config != "undefined") {
+      console.info("Module does have a config.")
+    }
+    if (mod.position != "undefined") {
+      console.info("Module does have a position");
     }
   }
-}
 
-function parseModule(mod) {
-  if ()
-}
+  function sortClick() {
+      var sortableItems = $('#sortable1').find('li');
+		    var order = ['Calendar', 'Clock', 'Alarm Clock', 'Weather'];
+        var orderedItems = $.map(order, function(value) {
+          return sortableItems.get(value);
+        });
 
-function sortClick() {
-    var sortableItems = $('#sortable1').find('li');
-		var order = ['Calendar', 'Clock', 'Alarm Clock', 'Weather'];
-    var orderedItems = $.map(order, function(value) {
-    return sortableItems.get(value);
-  });
-
-  $('#sortable1').empty().html(order);
-}
+        $('#sortable1').empty().html(order);
+      }
 
 appendModules();
-
 </script>
+
+<script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+<script>window.mdc.autoInit();</script>
 
  <!--
 <form action="/github_upload.php">

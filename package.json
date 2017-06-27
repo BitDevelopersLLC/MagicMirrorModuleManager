@@ -1,0 +1,24 @@
+{
+  "name": "magicmirrorconfigurator",
+  "version": "1.0.0",
+  "description": "This web based software allows configurations via a GUI interface for the MagicMirror2 Software configurations and modules..",
+  "main": "app.js",
+  "dependencies": {
+    "@material/grid-list": "^0.2.5",
+    "material-components-web": "^0.13.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EliteByte/MagicMirrorConfigurator.git"
+  },
+  "author": "Mario Figueroa",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EliteByte/MagicMirrorConfigurator/issues"
+  },
+  "homepage": "https://github.com/EliteByte/MagicMirrorConfigurator#readme"
+}
