@@ -1,16 +1,18 @@
 <!doctype html>
-<html class="mdc-typography" lang="en">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MMMM</title>
   <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-  <link rel="stylesheet" href="node_modules/material-components-web/dist/material-components-web.css"> </link>
-  
+  <link rel="stylesheet" href="./mdl/material.css">
+  <script src="./mdl/material.min.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
   <style>
   #sortable1, #sortable2, #sortable3 {
     border: 1px solid #eee;
-    width: 142px;
+    width: 200px;
     min-height: 20px;
     list-style-type: none;
     margin: 0;
@@ -25,7 +27,6 @@
     width: 120px;
   }
   </style>
-  
   <script src="http://code.jquery.com/jquery-1.12.4.js"></script>
   <script src="http://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   <script>
@@ -35,41 +36,13 @@
     }).disableSelection();
   } );
   </script>
-  
+</head>
 <body>
- 
 
-<ul id="sortable1" class="mdc-list">
+
+<ul id="sortable1" class="connectedSortable">
   <h3 align="center"> Active </h3>
-  <li style="cursor:pointer" onclick="sortClick()" class="ui-state-default" class="mdc-list-item" >Clock</li>
-  <li style="cursor:pointer" onclick="window.location='index.html'" class="mdc-list-item" >Calendar</li>
-  <li style="cursor:pointer" onclick="window.location='index.html'" class="mdc-list-item" >Weather</li>
-  <li style="cursor:pointer" onclick="window.location='index.html'"  class="mdc-list-item" >Alarm Clock</li>
 </ul>
-
-<nav class="mdc-list">
-    <a href="/wifi" class="mdc-list-item" data-mdc-auto-init="MDCRipple">
-        <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">
-            network_wifi
-        </i>
-        Wi-Fi
-    </a>
-    <a href="/bluetooth" class="mdc-list-item" data-mdc-auto-init="MDCRipple">
-        <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">
-            bluetooth
-        </i>
-        Bluetooth
-    </a>
-    <a href="/data-usage" class="mdc-list-item" data-mdc-auto-init="MDCRipple">
-        <i class="material-icons mdc-list-item__start-detail" aria-hidden="true">
-            data_usage
-        </i>
-        Data Usage
-    </a>
-</nav>
-<script>
-    mdc.autoInit();
-    </script>
 
 <ul id="sortable2" class="connectedSortable">
 	<h3 align="center">Inactive</h3>
@@ -78,21 +51,105 @@
 <ul id="sortable3" class="connectedSortable">
 	<h3 align="center">Module Config</h3>
 </ul>
- 
- <script>
-  	function sortClick() {
-		var sortableItems = $('#sortable1').find('li');
-		
+
+<style>
+.demo-card-wide.mdl-card {
+  width: 512px;
+}
+.demo-card-wide > .mdl-card__title {
+  color: #fff;
+  height: 176px;
+  background: url('../assets/demos/welcome_card.jpg') center / cover;
+}
+.demo-card-wide > .mdl-card__menu {
+  color: #fff;
+}
+</style>
+
+<div class="demo-card-wide mdl-card mdl-shadow--2dp">
+  <div class="mdl-card__title">
+    <h2 class="mdl-card__title-text">Welcome</h2>
+  </div>
+  <div class="mdl-card__supporting-text">
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+    Mauris sagittis pellentesque lacus eleifend lacinia...
+  </div>
+  <div class="mdl-card__actions mdl-card--border">
+    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+      Get Started
+    </a>
+  </div>
+  <div class="mdl-card__menu">
+    <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+      <i class="material-icons">share</i>
+    </button>
+  </div>
+</div>
+
+
+<script src="config.js"></script>
+
+<script>
+var rawModules = config.modules;
+var arrayModules = [];
+
+function appendModules() {
+  var buttonWidthSync = "180px";
+  var ul = document.getElementById("sortable1");
+
+  var arryNumber = -1;
+  for (mod in rawModules) {
+    var li = document.createElement("li");
+    var btn = document.createElement("button");
+    li.appendChild(btn);
+    li.className = "ui-state-default";
+    li.className = "mdl-button mdl-button--raised mdl-button--accent";
+    li.innerHTML = rawModules[mod].module;
+    li.style = "cursor:pointer";
+    li.style.fontSize = "1.3vw";
+    li.style.width = buttonWidthSync;
+    //console.info(rawModules[mod].module);
+    arrayModules.push(rawModules[mod].module);
+    arryNumber = arryNumber + 1;
+    li.id = arryNumber;
+    ul.appendChild(li);
+  }
+  ul.addEventListener('click', function(e) {
+      if (e.target.tagName == 'LI'){
+        var targetName = arrayModules[e.target.id];
+        parseModule(findModule(targetName));
+      }
+  });
+}
+
+
+function findModule(name) {
+  for (mod in rawModules) {
+    if (rawModules[mod].module == name) {
+        console.info(rawModules[mod]);
+      return;
+    }
+  }
+}
+
+function parseModule(mod) {
+  if ()
+}
+
+function sortClick() {
+    var sortableItems = $('#sortable1').find('li');
 		var order = ['Calendar', 'Clock', 'Alarm Clock', 'Weather'];
-		
-		var orderedItems = $.map(order, function(value) {
-			return sortableItems.get(value);
-		});
-		
-		$('#sortable1').empty().html(order);
-	}
- </script>
- 
+    var orderedItems = $.map(order, function(value) {
+    return sortableItems.get(value);
+  });
+
+  $('#sortable1').empty().html(order);
+}
+
+appendModules();
+
+</script>
+
  <!--
 <form action="/github_upload.php">
 	<br></br><br></br>
@@ -101,7 +158,7 @@
 	<input type="submit" value="Submit">
 </form>
  -->
- 
- 
+
+
 </body>
 </html>
