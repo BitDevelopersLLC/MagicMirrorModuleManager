@@ -15,8 +15,8 @@
   }
   .demo-card-wide > .mdl-card__title {
     color: #fff;
-    height: 176px;
-    background: url('images/background.jpg') center / cover;
+    height: 65px;
+    background-color: #485cb0;
   }
   .demo-card-wide > .mdl-card__menu {
     color: #fff;
@@ -69,14 +69,14 @@
       </ul>
 
       <!-- Start Config Card -->
-      <div class="demo-card mdl-card mdl-shadow--2dp">
+      <div class="demo-card-wide mdl-card mdl-shadow--2dp">
 
         <div class="mdl-card__title">
           <h2 class="mdl-card__title-text">Config</h2>
         </div>
 
         <ul id="configList" class="demo-list-control mdl-list">
-          <li class="mdl-list__item">
+          <li class="mdl-list__item" id="superman">
             <span class="mdl-list__item-primary-content">
               <i class="material-icons  mdl-list__item-icon">chrome_reader_mode</i>
               Enabled
@@ -88,6 +88,15 @@
             </span>
           </li>
         </ul>
+        <!-- <li class="mdl-list__item">
+        <span class="mdl-list__item-primary-content">Title:</span>
+          <span class="mdl-list__item-secondary-action">
+             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input class="mdl-textfield__input" type="text" id="sample2">
+                <label class="mdl-textfield__label" for="sample3">Text...</label>
+             </div>
+          </span>
+        </li> -->
 
         <div class="mdl-card__actions mdl-card--border">
         </div>
@@ -109,6 +118,11 @@
           </ul>
           <!-- End Position Button -->
     </div>
+
+    <div id="demo-toast-example" class="mdl-js-snackbar mdl-snackbar">
+      <div class="mdl-snackbar__text"></div>
+      <button class="mdl-snackbar__action" type="button"></button>
+    </div>
   </main>
 
 
@@ -119,6 +133,7 @@
   var arrayModules = [];
   var mapModulePositions = {};
   var updatedPosition = null;
+  var currentPosition = null;
 
 function appendModules() {
   var ul = document.getElementById("sortable1");
@@ -133,6 +148,7 @@ function appendModules() {
     li.appendChild(btn);
     li.className = "ui-state-default";
     li.className = "mdl-button mdl-button--raised mdl-button--colored";
+    li.className = "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored";
     li.innerHTML = rawModules[mod].module;
     li.style = "cursor:pointer";
     li.style.fontSize = "1.3vw";
@@ -143,45 +159,68 @@ function appendModules() {
     ul.appendChild(li);
   }
   ul.addEventListener('click', function(e) {
-      if (e.target.tagName == 'LI'){
-        var targetName = arrayModules[e.target.id];
-        parseModule(findModule(targetName));
+      if (e.target.tagName == 'SPAN'){
+        var targetName = arrayModules[e.target.parentNode.id];
+        $("li[id=configItem]").remove();
+        $("div[id=configItem]").remove();
+        setTimeout(function () {populateConfigCard(findModule(targetName)); }, 20);
       }
   });
 }
 
-// <li class="mdl-list__item">
-//   <span class="mdl-list__item-primary-content">
-//     Aaron Paul
-//   </span>
-//   <span class="mdl-list__item-secondary-action">
-//     <label class="demo-list-radio mdl-radio mdl-js-radio mdl-js-ripple-effect" for="list-option-1">
-//       <input type="radio" id="list-option-1" class="mdl-radio__button" name="options" value="1" checked />
-//     </label>
-//   </span>
-// </li>
-
-
-function populateConfigCard(module) {
+function populateConfigCard(mod) {
   var ul = document.getElementById("configList");
-  var li = document.createElement("li");
-    li.className = "mdl-list__item";
-    var spanPrimary = document.createElement("span");
-      spanPrimary.className = "mdl-list__item-primary-content";
-      spanPrimary.innerHTML = ""
+  if (mod.config != null) {
+  for (cfg in mod.config) {
+    var li = document.createElement("li");
+      li.className = "mdl-list__item lit";
+      li.id = "configItem";
+      var spanPrimary = document.createElement("span");
+        spanPrimary.className = "mdl-list__item-primary-content";
+        spanPrimary.innerHTML = cfg + ":  ";
+      var spanSecondary = document.createElement("span");
+        spanSecondary.className = "mdl-list__item-secondary-action";
+        var div = document.createElement("div");
+        div.className = "mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-upgraded";
+        div.id = cfg;
+        setTimeout(function () { componentHandler.upgradeDom('MaterialTextfield', 'mdl-textfield'); }, 10);
+          var input = document.createElement("input");
+            input.className = "mdl-textfield__input";
+            input.type = "text";
+            input.id = cfg;
+          var label = document.createElement("label");
+            label.className = "mdl-textfield__label";
+            label.htmlFor = cfg;
+            label.textContent = mod.config[cfg];
+          div.appendChild(input);
+        div.appendChild(label);
+        ul.appendChild(li);
+      spanSecondary.appendChild(div);
+    li.appendChild(spanPrimary);
+  li.appendChild(spanSecondary);
 
+      }
+    } else {
+      // $("div[id=configItem]").remove();
+      // var h = document.createElement("div");
+      // h.id = "configItem";
+      // h.innerHTML = "Module doesn't have Config";
+      // ul.appendChild(h);
+      snackBar(mod.module + ", module doesn't have a config");
+    }
+}
 
+function parseModule(mod) {
+  if (mod.config != null) {
+    console.info("Module does have a config.")
+  }
+  if (mod.position != null) {
+    console.info("Module does have a position");
+  }
 }
 
 
 function populatePositionDropdown() {
-  //var properPositionName = {top_bar:"Top Bar", bottom_bar:"Bottom Bar", top_left:"Top Left", bottom_left:"Bottom Left", top_right:"Top Right", bottom_right:"Bottom Right", top_center:"Top Center", bottom_center:"Bottom Center", upper_third:"Upper Third", middle_center:"Middle Center", lower_center:"Lower Center"};
-  //var rawPositions = ["top_bar", "bottom_bar", "top_left", "bottom_left", "top_right", "bottom_right", "top_center", "bottom_center", "upper_third", "middle_center", "lower_center"];
-  //var properPositions = ["Top Bar", "Bottom Bar", "Top Left", "Bottom Left", "Top Right", "Bottom Right", "Top Center", "Bottom Center", "Upper Third", "Middler Center", "Lower Center"];
-  //for (i = 0; i < rawPositions.length; i++) {
-    //properPositionName[i] = rawPositions[i];
-  //}
-
   var ul = document.getElementById("positionList");
   var validPositions = positionsNotTaken();
 
@@ -204,20 +243,11 @@ function populatePositionDropdown() {
   function findModule(name) {
     for (mod in rawModules) {
       if (rawModules[mod].module == name) {
-          console.info(rawModules[mod]);
-          return;
+          //console.info(rawModules[mod]);
+          return rawModules[mod];
         }
       }
     }
-
-  function parseModule(mod) {
-    if (mod.config != "undefined") {
-      console.info("Module does have a config.")
-    }
-    if (mod.position != "undefined") {
-      console.info("Module does have a position");
-    }
-  }
 
   function parseModules() {
     for (mod in rawModules) {
@@ -249,6 +279,12 @@ function populatePositionDropdown() {
 
         $('#sortable1').empty().html(order);
       }
+
+    function snackBar(msg) {
+        var snackbarContainer = document.querySelector('#demo-toast-example');
+        var data = {message: msg};
+        snackbarContainer.MaterialSnackbar.showSnackbar(data);
+    }
 
 appendModules();
 parseModules();
