@@ -11,7 +11,7 @@
 
   <style>
   .demo-card-wide.mdl-card {
-    width: 512px;
+    width: 384px;
   }
   .demo-card-wide > .mdl-card__title {
     color: #fff;
@@ -88,23 +88,14 @@
             </span>
           </li>
         </ul>
-        <!-- <li class="mdl-list__item">
-        <span class="mdl-list__item-primary-content">Title:</span>
-          <span class="mdl-list__item-secondary-action">
-             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                <input class="mdl-textfield__input" type="text" id="sample2">
-                <label class="mdl-textfield__label" for="sample3">Text...</label>
-             </div>
-          </span>
-        </li> -->
+
+
 
         <div class="mdl-card__actions mdl-card--border">
         </div>
-
-          <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
-            Update
-          </a>
-
+        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+          Update
+        </button>
 
           <!-- Position Button - Top Right -->
           <div class="mdl-card__menu">
@@ -162,7 +153,6 @@ function appendModules() {
       if (e.target.tagName == 'SPAN'){
         var targetName = arrayModules[e.target.parentNode.id];
         $("li[id=configItem]").remove();
-        $("div[id=configItem]").remove();
         setTimeout(function () {populateConfigCard(findModule(targetName)); }, 20);
       }
   });
@@ -170,44 +160,110 @@ function appendModules() {
 
 function populateConfigCard(mod) {
   var ul = document.getElementById("configList");
+
   if (mod.config != null) {
-  for (cfg in mod.config) {
-    var li = document.createElement("li");
-      li.className = "mdl-list__item lit";
-      li.id = "configItem";
+    var configObjectMap = {};
+    for (cfg in mod.config) {
+      var li = document.createElement("li");
+        li.className = "mdl-list__item lit";
+        li.id = "configItem";
+        var spanPrimary = document.createElement("span");
+          spanPrimary.className = "mdl-list__item-primary-content";
+          spanPrimary.innerHTML = cfg + ":  ";
+          spanPrimary.style.padding = "10px";
+          var spanSecondary = document.createElement("span");
+          spanSecondary.className = "mdl-list__item-secondary-action";
+          spanSecondary.id = cfg;
+          if (mod.config[cfg] != "[object Object]") {
+            var div = document.createElement("div");
+            div.className = "mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-upgraded";
+            var input = document.createElement("input");
+                input.className = "mdl-textfield__input";
+                input.type = "text";
+                input.id = cfg;
+              var label = document.createElement("label");
+                label.className = "mdl-textfield__label";
+                label.htmlFor = cfg;
+                label.textContent = mod.config[cfg];
+                div.appendChild(input);
+                div.appendChild(label);
+                spanSecondary.appendChild(div);
+          }
+          else {
+            configObjectMap[cfg] = mod.config[cfg][0];
+            var button = document.createElement("button");
+              button.id = "dropdown" + cfg;
+              button.className = "mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon";
+              var i = document.createElement("i");
+                i.className = "material-icons";
+                i.innerHTML = "arrow_drop_down";
+              button.appendChild(i);
+              spanSecondary.appendChild(button);
+              button.onclick = function() {
+                    extendConfigItem(this.parentNode.parentNode, configObjectMap[this.parentNode.id]);
+                  }
+            }
+
+            setTimeout(function () { componentHandler.upgradeDom('MaterialTextfield', 'mdl-textfield'); }, 10);
+            li.appendChild(spanPrimary);
+            li.appendChild(spanSecondary);
+            ul.appendChild(li);
+      }
+    } else { snackBar(mod.module + ", module doesn't have a config"); }
+}
+
+function extendConfigItem(configItem, items) {
+  var ul = document.createElement("ul");
+  ul.className = "demo-list-control mdl-list";
+  for (cfg in items) {
+      var li = document.createElement("li");
+      li.className = "mdl-list__item";
+      li.id = cfg;
+      li.style.padding = "0px 0px 0px 20px";
       var spanPrimary = document.createElement("span");
         spanPrimary.className = "mdl-list__item-primary-content";
         spanPrimary.innerHTML = cfg + ":  ";
-      var spanSecondary = document.createElement("span");
+        spanPrimary.style.padding = "10px";
+        var spanSecondary = document.createElement("span");
         spanSecondary.className = "mdl-list__item-secondary-action";
-        var div = document.createElement("div");
-        div.className = "mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-upgraded";
-        div.id = cfg;
-        setTimeout(function () { componentHandler.upgradeDom('MaterialTextfield', 'mdl-textfield'); }, 10);
+        spanSecondary.id = cfg;
+        if (items[cfg] != "[object Object]") {
+          var div = document.createElement("div");
+          div.className = "mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-upgraded";
           var input = document.createElement("input");
-            input.className = "mdl-textfield__input";
-            input.type = "text";
-            input.id = cfg;
-          var label = document.createElement("label");
-            label.className = "mdl-textfield__label";
-            label.htmlFor = cfg;
-            label.textContent = mod.config[cfg];
-          div.appendChild(input);
-        div.appendChild(label);
-        ul.appendChild(li);
-      spanSecondary.appendChild(div);
-    li.appendChild(spanPrimary);
-  li.appendChild(spanSecondary);
+              input.className = "mdl-textfield__input";
+              input.type = "text";
+              input.id = cfg;
+            var label = document.createElement("label");
+              label.className = "mdl-textfield__label";
+              label.htmlFor = cfg;
+              label.textContent = items[cfg];
+              div.appendChild(input);
+              div.appendChild(label);
+              spanSecondary.appendChild(div);
+        }
+        else {
+          configObjectMap[cfg] = items[cfg][0];
+          var button = document.createElement("button");
+            button.id = "dropdown" + cfg;
+            button.className = "mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon";
+            var i = document.createElement("i");
+              i.className = "material-icons";
+              i.innerHTML = "arrow_drop_down";
+            button.appendChild(i);
+            spanSecondary.appendChild(button);
+            button.onclick = function() {
+                  extendConfigItem(this.parentNode.parentNode, configObjectMap[this.parentNode.id]);
+                }
+          }
 
-      }
-    } else {
-      // $("div[id=configItem]").remove();
-      // var h = document.createElement("div");
-      // h.id = "configItem";
-      // h.innerHTML = "Module doesn't have Config";
-      // ul.appendChild(h);
-      snackBar(mod.module + ", module doesn't have a config");
+          setTimeout(function () { componentHandler.upgradeDom('MaterialTextfield', 'mdl-textfield'); }, 10);
+          li.appendChild(spanPrimary);
+          li.appendChild(spanSecondary);
+          ul.appendChild(li);
     }
+    console.info(configItem);
+    configItem.appendChild(ul);
 }
 
 function parseModule(mod) {
@@ -234,7 +290,7 @@ function populatePositionDropdown() {
   ul.addEventListener('click', function(e) {
       if (e.target.tagName == 'LI'){
         var icon = document.getElementById("demo-menu-lower-right");
-        icon.style.color = "#485cb0";
+        icon.style.color = "#ec4174";
         updatedPosition = e.target.id;
       }
   });
