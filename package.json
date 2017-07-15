@@ -2,7 +2,7 @@
   "name": "magicmirrorconfigurator",
   "version": "1.0.0",
   "description": "This web based software allows configurations via a GUI interface for the MagicMirror2 Software configurations and modules..",
-  "main": "app.js",
+  "main": "server.js",
   "dependencies": {
     "@material/grid-list": "^0.2.5",
     "material-components-web": "^0.13.0"
