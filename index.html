@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MMMM</title>
-  <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <link rel="stylesheet" href="./mdl/material.css">
   <script src="./mdl/material.min.js"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -93,7 +93,7 @@
 
         <div class="mdl-card__actions mdl-card--border">
         </div>
-        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onclick="updateConfig()">
           Update
         </button>
 
@@ -120,7 +120,7 @@
 <script src="config.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script>
-  var socket = io('http://localhost:8125');
+  var socket = io('http://localhost:8125', {secure: true});
   socket.on('news', function (data) {
     console.log(data);
     socket.emit('my other event', { my: 'data' });
@@ -133,6 +133,28 @@
   var mapModulePositions = {};
   var updatedPosition = null;
   var currentPosition = null;
+
+  var dynamicConfig = null;
+
+
+
+function updateConfig() {
+  if (dynamicConfig != null) {
+    var configElement = document.getElementById("configList");
+    var inputs = configElement.getElementsByClassName("mdl-textfield__input");
+
+    console.error(configElement);
+    console.log(inputs);
+
+  } else { console.error("This was caused by updateConfig() func being called with no config loaded. This shouldn't occur.") }
+
+}
+
+function pushConfigChanges() {
+
+
+}
+
 
 function appendModules() {
   var ul = document.getElementById("sortable1");
@@ -166,11 +188,14 @@ function appendModules() {
   });
 }
 
+
+
 function populateConfigCard(mod) {
   var ul = document.getElementById("configList");
 
   if (mod.config != null) {
     var configObjectMap = {};
+    dynamicConfig = mod.config;
     for (cfg in mod.config) {
       var li = document.createElement("li");
         li.className = "mdl-list__item lit";
@@ -217,7 +242,7 @@ function populateConfigCard(mod) {
             li.appendChild(spanSecondary);
             ul.appendChild(li);
       }
-    } else { snackBar(mod.module + ", module doesn't have a config"); }
+    } else { dynamicConfig = null; snackBar(mod.module + ", module doesn't have a config"); }
 }
 
 function extendConfigItem(configItem, items) {

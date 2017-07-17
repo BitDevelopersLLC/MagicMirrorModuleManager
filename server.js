@@ -2,10 +2,26 @@ var url = require('url')
 var fs = require('fs')
 var path = require('path')
 
-var app = require('http').createServer(handler)
+var localtunnel = require('localtunnel');
+
+var app = require('http').createServer(handler, {ssl: 'true'})
 var io = require('socket.io')(app);
 
-app.listen(8125);
+var port = 8125;
+
+var tunnel = localtunnel(port, { subdomain: 'magicmirror'}, function(err, tunnel) {
+    if (err) {}
+
+    // the assigned public url for your tunnel
+    // i.e. https://abcdefgjhij.localtunnel.me
+    console.log('Server Running at ' + tunnel.url);
+});
+
+tunnel.on('close', function() {
+    console.log("Tunnel is closed.");
+});
+
+app.listen(port);
 
 function handler (request, response) {
   console.log('request ', request.url);
@@ -55,7 +71,6 @@ function handler (request, response) {
             }
           });
 }
-        console.log('Server running at http://127.0.0.1:8125/');
 
 
 io.on('connection', function (socket) {
