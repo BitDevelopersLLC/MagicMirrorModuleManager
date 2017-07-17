@@ -45,6 +45,8 @@
     font-size: 1.2em;
     width: 120px;
   }
+
+
   </style>
   <script src="http://code.jquery.com/jquery-1.12.4.js"></script>
   <script src="http://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -64,12 +66,12 @@
     <div class="mdl-grid demo-content">
 
       <!-- Start Module List Card -->
-      <ul id="sortable1" class="connectedSortable mdl-shadow--2dp">
+      <ul id="sortable1" class="demo-card-wide mdl-shadow--2dp">
         <h3 align="center">Modules</h3>
       </ul>
 
       <!-- Start Config Card -->
-      <div class="demo-card-wide mdl-card mdl-shadow--2dp">
+      <div id="configCard" class="demo-card-wide mdl-card mdl-shadow--2dp">
 
         <div class="mdl-card__title">
           <h2 class="mdl-card__title-text">Config</h2>
@@ -93,19 +95,19 @@
 
         <div class="mdl-card__actions mdl-card--border">
         </div>
-        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onclick="updateConfig()">
+        <button id="updateButton" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onclick="updateConfig()">
           Update
         </button>
 
           <!-- Position Button - Top Right -->
           <div class="mdl-card__menu">
-            <button id="demo-menu-lower-right"
+            <button id="positionButton"
                     class="mdl-button mdl-js-button mdl-button--icon">
               <i class="material-icons">my_location</i>
             </button>
           </div>
           <ul id="positionList" class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
-            for="demo-menu-lower-right">
+            for="positionButton">
           </ul>
           <!-- End Position Button -->
     </div>
@@ -136,6 +138,34 @@
 
   var dynamicConfig = null;
 
+function triggerHandicap(parts) {
+  var updateButton = document.getElementById("updateButton");
+  var configCard = document.getElementById("configCard");
+  var partKeys = Object.keys(parts);
+
+  console.log(partKeys);
+  console.log(parts[partKeys[0]]);
+  for (part in partKeys) {
+    var partElement = document.getElementById(partKeys[part]);
+
+    switch (parts[partKeys[part]]) {
+        case "disable":
+            partElement.disabled = true;
+            break;
+        case "enable":
+            partElement.disabled = false;
+            break;
+        case "show":
+            partElement.style.display = "initial";
+            break;
+        case "hide":
+            partElement.style.display = "none";
+            break;
+        default:
+            console.error("triggerHandicap() was called but the key's value which was passed didn't satisfy any elements.");
+    }
+  }
+}
 
 
 function updateConfig() {
@@ -167,13 +197,12 @@ function appendModules() {
     var li = document.createElement("li");
     var btn = document.createElement("button");
     li.appendChild(btn);
-    li.className = "ui-state-default";
-    li.className = "mdl-button mdl-button--raised mdl-button--colored";
     li.className = "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored";
     li.innerHTML = rawModules[mod].module;
     li.style = "cursor:pointer";
-    li.style.fontSize = "1.3vw";
+    li.style.fontSize = "15px";
     li.style.width = buttonWidthSync;
+    li.style.textAlign = "center";
     arrayModules.push(rawModules[mod].module);
     arryNumber = arryNumber + 1;
     li.id = arryNumber;
@@ -242,7 +271,18 @@ function populateConfigCard(mod) {
             li.appendChild(spanSecondary);
             ul.appendChild(li);
       }
-    } else { dynamicConfig = null; snackBar(mod.module + ", module doesn't have a config"); }
+    } else {
+      dynamicConfig = null;
+      if (mod.position == null) {
+          if (mod.config == null) {
+            triggerHandicap(configCard: "hide");
+            snackBar(mod.module + ", module isn't configurable.");
+          }
+        }
+      else if (mod.position != null) {
+
+      }
+    }
 }
 
 function extendConfigItem(configItem, items) {
@@ -322,7 +362,7 @@ function populatePositionDropdown() {
   }
   ul.addEventListener('click', function(e) {
       if (e.target.tagName == 'LI'){
-        var icon = document.getElementById("demo-menu-lower-right");
+        var icon = document.getElementById("positionButton");
         icon.style.color = "#ec4174";
         updatedPosition = e.target.id;
       }
@@ -378,6 +418,7 @@ function populatePositionDropdown() {
 appendModules();
 parseModules();
 populatePositionDropdown();
+triggerHandicap({configCard: "hide"});
 </script>
 
 <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>

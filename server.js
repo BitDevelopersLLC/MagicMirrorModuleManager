@@ -9,19 +9,33 @@ var io = require('socket.io')(app);
 
 var port = 8125;
 
-var tunnel = localtunnel(port, { subdomain: 'magicmirror'}, function(err, tunnel) {
-    if (err) {}
+function LocalTunnel(port, subdomain) {
+   var  tunnel = localtunnel(port, { subdomain: subdomain}, function (err, tunnel) {
+        if (err) {
+            console.error("localTunnelCode Failed with error: " + inspect(err))
+        } else {
+            console.info("localTunnelCode connected and exposed on : " + tunnel.url + ":" + tunnel._opt.port)
+        }
+    })
+    tunnel.on('close', function () {
+console.error("tunnel -> Tunnel Closed...Going to Restart")
+        tunnel = localtunnel(port, { subdomain: subdomain }, function (err, tunnel) {
+            if (err) {
+console.error("localTunnelCode Restart Failed with error: " + inspect(err))
+            } else {
+console.warn("localTunnelCode Re-Connected and exposed on : " + tunnel.url + ":" + tunnel._opt.port)
+            }
+        })
+    })
 
-    // the assigned public url for your tunnel
-    // i.e. https://abcdefgjhij.localtunnel.me
-    console.log('Server Running at ' + tunnel.url);
-});
+    tunnel.on('error', function (err) {
+console.error("tunnel Error -> " + inspect(err))
+    })
+}
 
-tunnel.on('close', function() {
-    console.log("Tunnel is closed.");
-});
+  LocalTunnel(port, 'magicmirror');
 
-app.listen(port);
+  setTimeout(function () { app.listen(port); }, 20);
 
 function handler (request, response) {
   console.log('request ', request.url);
