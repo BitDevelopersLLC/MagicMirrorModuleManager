@@ -122,10 +122,11 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
   var socket = io('http://localhost:8125', {secure: true});
-  socket.on('news', function (data) {
-    console.log(data);
-    socket.emit('my other event', { my: 'data' });
-  });
+
+  function sendOutData(data) {
+      //console.log(data);
+      socket.emit('configUpdate', data);
+  }
 </script>
 
 <script>
@@ -135,6 +136,7 @@
   var updatedPosition = null;
   var currentPosition = null;
   var updateStatic = false;
+  var currentModule = null;
 
   var dynamicConfig = {};
 
@@ -167,19 +169,18 @@ function triggerHandicap(parts) {
 
 
 function updateConfig() {
-  if (dynamicConfig != null) {
-    var configElement = document.getElementById("configList");
-    var inputs = configElement.getElementsByClassName("mdl-textfield__input");
-
-    console.error(configElement);
-    console.log(inputs);
-
-  } else { console.error("This was caused by updateConfig() func being called with no config loaded. This shouldn't occur.") }
+  if (Object.keys(dynamicConfig).length > 0) {
+    pushConfigChanges();
+  } else { console.error("This was caused by updateConfig() func being called with no config changes being made, yet updateButton was enabled.") }
 
 }
 
 function pushConfigChanges() {
-
+  if (dynamicConfig.position != null) {
+    
+  }
+  checkConfigCardInputs();
+  setTimeout(function () { sendOutData(dynamicConfig, currentModule); }, 5);
 
 }
 
@@ -208,9 +209,10 @@ function appendModules() {
   }
   ul.addEventListener('click', function(e) {
       if (e.target.tagName == 'SPAN') {
-        console.log(this);
+
         for (li in this.childNodes) {
-          if (this.childNodes[li].tagName = 'LI') {
+          if (this.childNodes[li].tagName == 'LI') {
+            //console.log(this.childNodes[li]);
             this.childNodes[li].style.color = "#FFFFFF";
           }
         }
@@ -227,7 +229,7 @@ function appendModules() {
 function populateConfigCard(mod) {
   var ul = document.getElementById("configList");
   updateStatic = false;
-
+  var currentModule = mod;
 
   if (mod.config != null) {
     var configObjectMap = {};
@@ -284,12 +286,13 @@ function populateConfigCard(mod) {
     } else {
       if (mod.position == null) {
           if (mod.config == null) {
+            triggerHandicap({updateButton: "disable", positionButton: "disable"});
             snackBar(mod.module + ", module isn't configurable.");
           }
         }
       else if (mod.position != null) {
         if (mod.config == null) {
-            triggerHandicap({updateButton: "disable"});
+            triggerHandicap({updateButton: "disable", positionButton: "enable", enableButton: "enable"});
             snackBar(mod.module + ", does not have a config, but position is avaiable.")
         }
       }
@@ -478,7 +481,7 @@ function populatePositionDropdown() {
 appendModules();
 parseModules();
 populatePositionDropdown();
-triggerHandicap({updateButton: "disable", positionButton: "disable", enableButton: "disable"});
+triggerHandicap({updateButton: "disable", positionButton: "disable"});
 </script>
 
 <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
