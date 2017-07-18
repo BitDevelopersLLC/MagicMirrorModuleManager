@@ -84,18 +84,17 @@
               Enabled
             </span>
             <span class="mdl-list__item-secondary-action">
-              <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="list-switch-1">
-                <input type="checkbox" id="list-switch-1" class="mdl-switch__input" checked />
+              <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="enableButton">
+                <input type="checkbox" id="enableButton" class="mdl-switch__input" checked />
               </label>
             </span>
           </li>
         </ul>
 
-
-
         <div class="mdl-card__actions mdl-card--border">
         </div>
-        <button id="updateButton" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onclick="updateConfig()">
+
+        <button id="updateButton" align="center" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onclick="updateConfig()">
           Update
         </button>
 
@@ -135,16 +134,15 @@
   var mapModulePositions = {};
   var updatedPosition = null;
   var currentPosition = null;
+  var updateStatic = false;
 
-  var dynamicConfig = null;
+  var dynamicConfig = {};
 
 function triggerHandicap(parts) {
   var updateButton = document.getElementById("updateButton");
   var configCard = document.getElementById("configCard");
   var partKeys = Object.keys(parts);
 
-  console.log(partKeys);
-  console.log(parts[partKeys[0]]);
   for (part in partKeys) {
     var partElement = document.getElementById(partKeys[part]);
 
@@ -209,7 +207,14 @@ function appendModules() {
     ul.appendChild(li);
   }
   ul.addEventListener('click', function(e) {
-      if (e.target.tagName == 'SPAN'){
+      if (e.target.tagName == 'SPAN') {
+        console.log(this);
+        for (li in this.childNodes) {
+          if (this.childNodes[li].tagName = 'LI') {
+            this.childNodes[li].style.color = "#FFFFFF";
+          }
+        }
+        e.target.parentNode.style.color = "#ec4174";
         var targetName = arrayModules[e.target.parentNode.id];
         $("li[id=configItem]").remove();
         setTimeout(function () {populateConfigCard(findModule(targetName)); }, 20);
@@ -221,10 +226,11 @@ function appendModules() {
 
 function populateConfigCard(mod) {
   var ul = document.getElementById("configList");
+  updateStatic = false;
+
 
   if (mod.config != null) {
     var configObjectMap = {};
-    dynamicConfig = mod.config;
     for (cfg in mod.config) {
       var li = document.createElement("li");
         li.className = "mdl-list__item lit";
@@ -241,11 +247,14 @@ function populateConfigCard(mod) {
             div.className = "mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-upgraded";
             var input = document.createElement("input");
                 input.className = "mdl-textfield__input";
-                input.type = "text";
+                input.type = "text"
                 input.id = cfg;
+                li.onkeyup = function() {
+                    updateToggle(this);
+                }
               var label = document.createElement("label");
                 label.className = "mdl-textfield__label";
-                label.htmlFor = cfg;
+                label.htmlFor = cfg
                 label.textContent = mod.config[cfg];
                 div.appendChild(input);
                 div.appendChild(label);
@@ -266,24 +275,60 @@ function populateConfigCard(mod) {
                   }
             }
 
+            triggerHandicap({enableButton: "enable", updateButton: "disable", positionButton: "enable"});
             setTimeout(function () { componentHandler.upgradeDom('MaterialTextfield', 'mdl-textfield'); }, 10);
             li.appendChild(spanPrimary);
             li.appendChild(spanSecondary);
             ul.appendChild(li);
       }
     } else {
-      dynamicConfig = null;
       if (mod.position == null) {
           if (mod.config == null) {
-            triggerHandicap(configCard: "hide");
             snackBar(mod.module + ", module isn't configurable.");
           }
         }
       else if (mod.position != null) {
-
+        if (mod.config == null) {
+            triggerHandicap({updateButton: "disable"});
+            snackBar(mod.module + ", does not have a config, but position is avaiable.")
+        }
       }
     }
 }
+
+function updateToggle(element) {
+  var updateButton = document.getElementById("updateButton");
+
+  checkConfigCardInputs()
+
+  setTimeout(function () {
+    if (Object.keys(dynamicConfig).length > 0) {
+      updateButton.disabled = false;
+    } else {
+      updateButton.disabled = true;
+    }
+   }, 5);
+}
+
+function checkConfigCardInputs() {
+  var configCard = document.getElementById("configList");
+  var newModuleConfig = {};
+
+    if (configCard.childNodes.length > 1) {
+      for (li in configCard.childNodes) {
+          if (configCard.childNodes[li].id == "configItem") {
+            var input = configCard.childNodes[li].childNodes[1].childNodes[0].childNodes[0].value;
+            if (input != "") {
+              newModuleConfig[configCard.childNodes[li].childNodes[1].id] = input;
+            } else {
+              delete newModuleConfig[configCard.childNodes[li].childNodes[1].id];
+            }
+          }
+      }
+    }
+  dynamicConfig = newModuleConfig;
+}
+
 
 function extendConfigItem(configItem, items) {
   var ul = document.createElement("ul");
@@ -307,6 +352,9 @@ function extendConfigItem(configItem, items) {
               input.className = "mdl-textfield__input";
               input.type = "text";
               input.id = cfg;
+              li.onkeyup = function() {
+                updateToggle(this);
+              }
             var label = document.createElement("label");
               label.className = "mdl-textfield__label";
               label.htmlFor = cfg;
@@ -339,16 +387,6 @@ function extendConfigItem(configItem, items) {
     configItem.appendChild(ul);
 }
 
-function parseModule(mod) {
-  if (mod.config != null) {
-    console.info("Module does have a config.")
-  }
-  if (mod.position != null) {
-    console.info("Module does have a position");
-  }
-}
-
-
 function populatePositionDropdown() {
   var ul = document.getElementById("positionList");
   var validPositions = positionsNotTaken();
@@ -360,13 +398,35 @@ function populatePositionDropdown() {
       li.id = validPositions[pos];
       ul.appendChild(li);
   }
+
   ul.addEventListener('click', function(e) {
       if (e.target.tagName == 'LI'){
         var icon = document.getElementById("positionButton");
         icon.style.color = "#ec4174";
-        updatedPosition = e.target.id;
+        var updateButton = document.getElementById("updateButton");
+
+        for (li in e.target.parentNode.childNodes) {
+          if (e.target.parentNode.childNodes[li].tagName == 'LI') {
+            e.target.parentNode.childNodes[li].style.backgroundColor = "#FFFFFF"
+          }
+        }
+        if (e.target.id == updatedPosition) {
+          delete dynamicConfig.position;
+          if (Object.keys(dynamicConfig).length == 0) {
+            updateButton.disabled = true;
+          }
+          updatedPosition = null;
+          e.target.style.backgroundColor = "#FFFFFF";
+          icon.style.color = "#FFFFFF";
+        } else {
+          updateButton.disabled = false;
+          updatedPosition = e.target.id;
+          e.target.style.backgroundColor = "#ec4174";
+          dynamicConfig.position = e.target.id;
+        }
       }
   });
+  console.log(dynamicConfig);
 }
 
   function findModule(name) {
@@ -418,7 +478,7 @@ function populatePositionDropdown() {
 appendModules();
 parseModules();
 populatePositionDropdown();
-triggerHandicap({configCard: "hide"});
+triggerHandicap({updateButton: "disable", positionButton: "disable", enableButton: "disable"});
 </script>
 
 <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>

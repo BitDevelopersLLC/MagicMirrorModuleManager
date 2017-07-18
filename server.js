@@ -21,7 +21,7 @@ function LocalTunnel(port, subdomain) {
 console.error("tunnel -> Tunnel Closed...Going to Restart")
         tunnel = localtunnel(port, { subdomain: subdomain }, function (err, tunnel) {
             if (err) {
-console.error("localTunnelCode Restart Failed with error: " + inspect(err))
+console.error("localTunnelCode Restart Failed with error: " + err)
             } else {
 console.warn("localTunnelCode Re-Connected and exposed on : " + tunnel.url + ":" + tunnel._opt.port)
             }
@@ -29,7 +29,7 @@ console.warn("localTunnelCode Re-Connected and exposed on : " + tunnel.url + ":"
     })
 
     tunnel.on('error', function (err) {
-console.error("tunnel Error -> " + inspect(err))
+console.error("tunnel Error -> " + err)
     })
 }
 
