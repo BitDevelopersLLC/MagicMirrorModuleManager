@@ -86,81 +86,8 @@ function handler (request, response) {
           });
 }
 
-var config = {
-	port: 8080,
-	ipWhitelist: ["127.0.0.1", "::ffff:127.0.0.1", "::1"],
-
-	language: 'en',
-	timeFormat: 24,
-	units: 'imperial ',
-
-	modules: [
-		{
-			module: 'alert',
-		},
-		{
-			module: "updatenotification",
-			position: "top_bar"
-		},
-		{
-			module: 'clock',
-			position: 'top_left'
-		},
-		{
-			module: 'calendar',
-			header: 'US Holidays',
-			position: 'top_left',
-			config: {
-				maximumNumberOfDays: 90,
-				calendars: [
-					{
-						symbol: 'calendar-check-o ',
-						url: 'webcal://www.calendarlabs.com/templates/ical/US-Holidays.ics'
-					}
-				]
-			}
-		},
-		{
-			module: 'currentweather',
-			position: 'top_right',
-			config: {
-				units: 'imperial',
-				location: 'Ladera Ranch',
-				locationID: '5364199',  //ID from http://www.openweathermap.org
-				appid: '0d8cbd2c42f528549ddb896767e82809'
-			}
-		},
-		{
-			module: 'weatherforecast',
-			position: 'top_right',
-			header: 'Weather Forecast',
-			config: {
-				units: 'imperial',
-				location: 'Ladera Ranch',
-				locationID: '5364199',  //ID from http://www.openweathermap.org
-				appid: '0d8cbd2c42f528549ddb896767e82809'
-			}
-		},
-		{
-			module: 'newsfeed',
-			position: 'bottom_bar',
-			config: {
-				feeds: [
-					{
-						title: "New York Times",
-						url: "http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml"
-					}
-				],
-				showSourceTitle: true,
-				showPublishDate: true
-			}
-		},
-	]
-
-};
-
-function writeFile() {
-  var content = ("var config = " + JSON.stringify(config, null, "\t") + ";" + "\n if (typeof module !== 'undefined') {module.exports = config;}");
+function writeFile(content) {
+  //var content = ("var config = " + JSON.stringify(config, null, "\t") + ";" + "\n if (typeof module !== 'undefined') {module.exports = config;}");
   fs.writeFile("test.js", content, function(err) {
     if(err) {
         return console.log(err);
@@ -170,12 +97,10 @@ function writeFile() {
   });
 }
 
-writeFile();
-
 
 io.on('connection', function (socket) {
   socket.on('configUpdate', function (data, module) {
-    console.log(data);
-    console.log(module);
+    console.log("A client has pushed an update to the Config.js file.");
+    writeFile(data);
   });
 });

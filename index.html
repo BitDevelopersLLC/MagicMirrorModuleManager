@@ -137,8 +137,31 @@
   var currentPosition = null;
   var updateStatic = false;
   var currentModule = null;
+  var currentModulePos = null;
 
+  var fullDynamicConfig = config;
   var dynamicConfig = {};
+
+function checkHash() {
+  var href = window.location.href;
+  if(href.indexOf("#") > 0){
+    var hashName = window.location.hash.substr(1, window.location.hash.lastIndexOf(''));
+    var modules = document.getElementById('sortable1').childNodes;
+
+    //Need to add style color to the preselected thing
+    //e.target.parentNode.style.color = "#ec4174";
+    for (li in modules) {
+      if (modules[li].tagName == 'LI') {
+        if (modules[li].innerHTML == hashName) {
+          modules[li].style.color = "#ec4174";
+        }
+      }
+    }
+    populateConfigCard(findModule(hashName));
+  } else {
+    console.log("URL Requested, does not contain a known anchor hash.");
+  }
+}
 
 function triggerHandicap(parts) {
   var updateButton = document.getElementById("updateButton");
@@ -162,27 +185,45 @@ function triggerHandicap(parts) {
             partElement.style.display = "none";
             break;
         default:
-            console.error("triggerHandicap() was called but the key's value which was passed didn't satisfy any elements.");
+            console.error("triggerHandicap() was called with key, " + parts[partKeys[part]] + " but the key's value which was passed didn't satisfy any elements. Try, [disable|enable|show|hide]");
     }
   }
 }
 
 
 function updateConfig() {
+  console.error(config);
+  console.log(fullDynamicConfig);
   if (Object.keys(dynamicConfig).length > 0) {
-    pushConfigChanges();
+    if (dynamicConfig.position != null) {
+      fullDynamicConfig.modules[findModulePosition(currentModule.module)].position = dynamicConfig.position;
+      delete dynamicConfig.position;
+    }
+    for (cfg in dynamicConfig) {
+      console.error("CFG: -> " + cfg);
+      fullDynamicConfig.modules[findModulePosition(currentModule.module)].config[cfg] = dynamicConfig[cfg];
+    }
+    checkConfigCardInputs();
+    var data = ("var config = " + JSON.stringify(fullDynamicConfig, null, "\t") + ";" + "\n if (typeof module !== 'undefined') {module.exports = config;}");
+    setTimeout(function () { sendOutData(data, currentModule); }, 5);
   } else { console.error("This was caused by updateConfig() func being called with no config changes being made, yet updateButton was enabled.") }
 
 }
 
-function pushConfigChanges() {
-  if (dynamicConfig.position != null) {
-    
-  }
-  checkConfigCardInputs();
-  setTimeout(function () { sendOutData(dynamicConfig, currentModule); }, 5);
+function clearConfig() {
+  var configCard = document.getElementById("configList");
 
+  if (configCard.childNodes.length > 1) {
+    for (li in configCard.childNodes) {
+        if (configCard.childNodes[li].id == "configItem") {
+          var input = configCard.childNodes[li].childNodes[1].childNodes[0].childNodes[0].value;
+          input = null;
+          triggerHandicap({updateButton: "disable", position});
+        }
+      }
+    }
 }
+
 
 
 function appendModules() {
@@ -218,6 +259,15 @@ function appendModules() {
         }
         e.target.parentNode.style.color = "#ec4174";
         var targetName = arrayModules[e.target.parentNode.id];
+
+        ///Hashing!
+        var href = window.location.href;
+        if(href.indexOf("#") > 0){
+            href = href.split("#")[0] + "?var=1#" + href.split("#")[1];
+            window.location.hash = '';
+        }
+        location.hash = ("#" + targetName);
+
         $("li[id=configItem]").remove();
         setTimeout(function () {populateConfigCard(findModule(targetName)); }, 20);
       }
@@ -229,9 +279,10 @@ function appendModules() {
 function populateConfigCard(mod) {
   var ul = document.getElementById("configList");
   updateStatic = false;
-  var currentModule = mod;
+  currentModule = mod;
 
   if (mod.config != null) {
+    populatePositionDropdown();
     var configObjectMap = {};
     for (cfg in mod.config) {
       var li = document.createElement("li");
@@ -292,6 +343,7 @@ function populateConfigCard(mod) {
         }
       else if (mod.position != null) {
         if (mod.config == null) {
+            populatePositionDropdown();
             triggerHandicap({updateButton: "disable", positionButton: "enable", enableButton: "enable"});
             snackBar(mod.module + ", does not have a config, but position is avaiable.")
         }
@@ -435,11 +487,20 @@ function populatePositionDropdown() {
   function findModule(name) {
     for (mod in rawModules) {
       if (rawModules[mod].module == name) {
-          //console.info(rawModules[mod]);
           return rawModules[mod];
         }
       }
     }
+
+    function findModulePosition(name) {
+      var int = -1;
+      for (mod in rawModules) {
+        int += 1;
+        if (rawModules[mod].module == name) {
+            return int;
+          }
+        }
+      }
 
   function parseModules() {
     for (mod in rawModules) {
@@ -480,7 +541,7 @@ function populatePositionDropdown() {
 
 appendModules();
 parseModules();
-populatePositionDropdown();
+checkHash();
 triggerHandicap({updateButton: "disable", positionButton: "disable"});
 </script>
 

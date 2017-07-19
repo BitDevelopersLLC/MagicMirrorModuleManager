@@ -36,7 +36,7 @@ var config = {
 		},
 		{
 			"module": "currentweather",
-			"position": "top_right",
+			"position": "lower_center",
 			"config": {
 				"units": "imperial",
 				"location": "Ladera Ranch",
@@ -46,10 +46,10 @@ var config = {
 		},
 		{
 			"module": "weatherforecast",
-			"position": "top_right",
+			"position": "top_center",
 			"header": "Weather Forecast",
 			"config": {
-				"units": "imperial",
+				"units": "Hello",
 				"location": "Ladera Ranch",
 				"locationID": "5364199",
 				"appid": "0d8cbd2c42f528549ddb896767e82809"
