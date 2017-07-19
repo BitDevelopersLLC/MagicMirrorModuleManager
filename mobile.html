@@ -31,22 +31,39 @@
 
   .page-content {
     margin: auto;
-    padding-top: 0.5cm;
+    padding-top: 0.25cm;
   }
 
   .mdl-grid {
   padding: 0!important;
   margin: auto;
-  scale: 0.25;
-    -moz-transform: scale(0.5);
 }
 
 .mdl-cell {
-  background: #bdbdbd;
-  padding: 30px 0;
+  background: #FFF0F5;
+  padding: calc(3.3vh) 0;
   text-align: center;
-  color: #424242;
+  color: #000000;
   font-weight: bold;
+  margin: 7px;
+}
+
+.cell--3-col-tablet.mdl-cell--3-col-tablet {
+  width: calc(33.3333vw - 16px);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.mdl-cell--1-col, .mdl-cell--1-col-tablet.mdl-cell--1-col-tablet {
+  width: calc(33.3333vw - 16px);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.mdl-cell--3-col {
+  width: calc(100vw - 24px);
+  margin-right: auto;
+  margin-left: auto;
 }
 
   #sortable1, #sortable2, #sortable3 {
@@ -166,40 +183,41 @@
       </section>
 
       <!-- Third Tab -->
-      <section  class="mdl-layout__tab-panel" id="fixed-tab-3">
-        <div  class="page-content">
-          <div>
+      <section class="mdl-layout__tab-panel" align="center" id="fixed-tab-3">
+        <div  class="page-content" style="padding-top: 0;" align="center">
+          <div style="margin-left: auto;margin-right: auto;">
 
           <div  class="demo-grid-ruler mdl-grid">
-             <div class="mdl-cell mdl-cell--9-col mdl-cell--9-col-tablet">top_bar</div>
+             <div class="mdl-cell mdl-cell--3-col mdl-cell--9-col-tablet mdl-button--raised mdl-js-ripple-effect mdl-button--colored">top_bar</div>
            </div>
 
-           <div  class="demo-grid-ruler mdl-grid">
-             <div class="mdl-cell mdl-cell--3-col mdl-cell--3-col-tablet">top_left</div>
-             <div class="mdl-cell mdl-cell--3-col mdl-cell--3-col-tablet">top_center</div>
-             <div class="mdl-cell mdl-cell--3-col mdl-cell--3-col-tablet">top_right</div>
+           <div  class="demo-grid-2 mdl-grid">
+             <div class="mdl-cell mdl-cell--1-col mdl-button--raised mdl-js-ripple-effect mdl-button--colored">
+             top_left</div>
+             <div class="mdl-cell mdl-cell--1-col mdl-button--raised mdl-js-ripple-effect mdl-button--colored">top_center</div>
+             <div class="mdl-cell mdl-cell--1-col mdl-button--raised mdl-js-ripple-effect mdl-button--colored">top_right</div>
             </div>
 
            <div  class="demo-grid-ruler mdl-grid">
-              <div class="mdl-cell mdl-cell--9-col mdl-cell--9-col-tablet">upper_third</div>
+              <div class="mdl-cell mdl-cell--3-col mdl-cell--9-col-tablet mdl-button--raised mdl-js-ripple-effect mdl-button--colored">upper_third</div>
             </div>
 
             <div  class="demo-grid-ruler mdl-grid">
-               <div class="mdl-cell mdl-cell--9-col mdl-cell--9-col-tablet">middle_center</div>
+               <div class="mdl-cell mdl-cell--3-col mdl-cell--9-col-tablet mdl-button--raised mdl-js-ripple-effect mdl-button--colored">middle_center</div>
              </div>
 
              <div  class="demo-grid-ruler mdl-grid">
-                <div class="mdl-cell mdl-cell--9-col mdl-cell--9-col-tablet">lower_center</div>
+                <div class="mdl-cell mdl-cell--3-col mdl-cell--9-col-tablet mdl-button--raised mdl-js-ripple-effect mdl-button--colored">lower_center</div>
               </div>
 
-             <div  class="demo-grid-ruler mdl-grid">
-               <div class="mdl-cell mdl-cell--3-col mdl-cell--3-col-tablet">bottom_left</div>
-               <div class="mdl-cell mdl-cell--3-col mdl-cell--3-col-tablet">bottom_center</div>
-               <div class="mdl-cell mdl-cell--3-col mdl-cell--3-col-tablet">bottom_right</div>
+             <div  class="demo-grid-2 mdl-grid">
+               <div class="mdl-cell mdl-cell--1-col mdl-button--raised mdl-js-ripple-effect mdl-button--colored">bottom_left</div>
+               <div class="mdl-cell mdl-cell--1-col mdl-button--raised mdl-js-ripple-effect mdl-button--colored">bottom_center</div>
+               <div class="mdl-cell mdl-cell--1-col mdl-button--raised mdl-js-ripple-effect mdl-button--colored">bottom_right</div>
               </div>
 
               <div  class="demo-grid-ruler mdl-grid">
-                 <div class="mdl-cell mdl-cell--9-col mdl-cell--9-col-tablet">bottom_bar</div>
+                 <div class="mdl-cell mdl-cell--3-col mdl-cell--9-col-tablet mdl-button--raised mdl-js-ripple-effect mdl-button--colored">bottom_bar</div>
                </div>
 
               <!--
