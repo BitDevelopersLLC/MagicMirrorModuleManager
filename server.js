@@ -2,40 +2,40 @@ var url = require('url')
 var fs = require('fs')
 var path = require('path')
 
-var localtunnel = require('localtunnel');
+//var localtunnel = require('localtunnel');
 
 var app = require('http').createServer(handler, {ssl: 'true'})
 var io = require('socket.io')(app);
 
 var port = 8125;
 
-function LocalTunnel(port, subdomain) {
-   var  tunnel = localtunnel(port, { subdomain: subdomain}, function (err, tunnel) {
-        if (err) {
-            console.error("localTunnelCode Failed with error: " + inspect(err))
-        } else {
-            console.info("localTunnelCode connected and exposed on : " + tunnel.url + ":" + tunnel._opt.port)
-        }
-    })
-    tunnel.on('close', function () {
-console.error("tunnel -> Tunnel Closed...Going to Restart")
-        tunnel = localtunnel(port, { subdomain: subdomain }, function (err, tunnel) {
-            if (err) {
-console.error("localTunnelCode Restart Failed with error: " + err)
-            } else {
-console.warn("localTunnelCode Re-Connected and exposed on : " + tunnel.url + ":" + tunnel._opt.port)
-            }
-        })
-    })
+// function LocalTunnel(port, subdomain) {
+//    var  tunnel = localtunnel(port, { subdomain: subdomain}, function (err, tunnel) {
+//         if (err) {
+//             console.error("localTunnelCode Failed with error: " + inspect(err))
+//         } else {
+//             console.info("localTunnelCode connected and exposed on : " + tunnel.url + ":" + tunnel._opt.port)
+//         }
+//     })
+//     tunnel.on('close', function () {
+// console.error("tunnel -> Tunnel Closed...Going to Restart")
+//         tunnel = localtunnel(port, { subdomain: subdomain }, function (err, tunnel) {
+//             if (err) {
+// console.error("localTunnelCode Restart Failed with error: " + err)
+//             } else {
+// console.warn("localTunnelCode Re-Connected and exposed on : " + tunnel.url + ":" + tunnel._opt.port)
+//             }
+//         })
+//     })
+//
+//     tunnel.on('error', function (err) {
+// console.error("tunnel Error -> " + err)
+//     })
+// }
+//
+//   LocalTunnel(port, 'magicmirror');
 
-    tunnel.on('error', function (err) {
-console.error("tunnel Error -> " + err)
-    })
-}
-
-  LocalTunnel(port, 'magicmirror');
-
-  setTimeout(function () { app.listen(port); }, 10);
+  setTimeout(function () { app.listen(port); }, 1);
 
 function handler (request, response) {
   console.log('request ', request.url);
