@@ -29,6 +29,15 @@
     display: inline;
   }
 
+  .page-content {
+    position: absolute;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+  }
+
   #sortable1, #sortable2, #sortable3 {
     border: 1px solid #eee;
     width: 200px;
@@ -60,61 +69,105 @@
 </head>
 
 <body>
+  <!-- Simple header with fixed tabs. -->
+  <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header
+              mdl-layout--fixed-tabs">
+    <header class="mdl-layout__header">
+      <div class="mdl-layout__header-row">
+        <!-- Title -->
+        <span class="mdl-layout-title">Title</span>
+      </div>
+      <!-- Tabs -->
+      <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
+        <a href="#fixed-tab-1" class="mdl-layout__tab is-active">Modules</a>
+        <a href="#fixed-tab-2" class="mdl-layout__tab">Config</a>
+        <a href="#fixed-tab-3" class="mdl-layout__tab">Positions</a>
+      </div>
+    </header>
+    <div class="mdl-layout__drawer">
+      <span class="mdl-layout-title">Title</span>
+    </div>
+    <main class="mdl-layout__content">
+
+      <!-- First Tab -->
+      <section class="mdl-layout__tab-panel is-active" id="fixed-tab-1">
+        <div align="center" class="page-content">
+          <!-- Start Module List Card -->
+          <div class="demo-card-wide mdl-card mdl-shadow--2dp">
+            <ul id="sortable1" class="demo-list-control mdl-list">
+            <div class="mdl-card__title">
+              <h2 class="mdl-card__title-text" text-align="center">Modules</h2>
+            </div>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Second Tab -->
+      <section class="mdl-layout__tab-panel" id="fixed-tab-2">
+        <div class="page-content mdl-grid demo-content">
+            <!-- Start Config Card -->
+            <div id="configCard" class="demo-card-wide mdl-card mdl-shadow--2dp">
+
+              <div class="mdl-card__title">
+                <h2 class="mdl-card__title-text">Config</h2>
+              </div>
+
+              <ul id="configList" class="demo-list-control mdl-list">
+                <li class="mdl-list__item" id="superman">
+                  <span class="mdl-list__item-primary-content">
+                    <i class="material-icons  mdl-list__item-icon">chrome_reader_mode</i>
+                    Enabled
+                  </span>
+                  <span class="mdl-list__item-secondary-action">
+                    <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="enableButton">
+                      <input type="checkbox" id="enableButton" class="mdl-switch__input" checked />
+                    </label>
+                  </span>
+                </li>
+              </ul>
+
+              <div class="mdl-card__actions mdl-card--border">
+              </div>
+
+              <button id="updateButton" align="center" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onclick="updateConfig()">
+                Update
+              </button>
+
+                <!-- Position Button - Top Right -->
+                <div class="mdl-card__menu">
+                  <button id="positionButton"
+                          class="mdl-button mdl-js-button mdl-button--icon">
+                    <i class="material-icons">my_location</i>
+                  </button>
+                </div>
+                <ul id="positionList" class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
+                  for="positionButton">
+                </ul>
+                <!-- End Position Button -->
+          </div>
+
+          <div id="demo-toast-example" class="mdl-js-snackbar mdl-snackbar">
+            <div class="mdl-snackbar__text"></div>
+            <button class="mdl-snackbar__action" type="button"></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Third Tab -->
+      <section class="mdl-layout__tab-panel" id="fixed-tab-3">
+        <div class="page-content"><!-- Your content goes here --></div>
+      </section>
+
+    </main>
+  </div>
+
 
 <!-- Start Main Grid -->
   <main class="mdl-layout__content mdl-color--grey-100">
     <div class="mdl-grid demo-content">
 
-      <!-- Start Module List Card -->
-      <ul id="sortable1" class="demo-card-wide mdl-shadow--2dp">
-        <h3 align="center">Modules</h3>
-      </ul>
 
-      <!-- Start Config Card -->
-      <div id="configCard" class="demo-card-wide mdl-card mdl-shadow--2dp">
-
-        <div class="mdl-card__title">
-          <h2 class="mdl-card__title-text">Config</h2>
-        </div>
-
-        <ul id="configList" class="demo-list-control mdl-list">
-          <li class="mdl-list__item" id="superman">
-            <span class="mdl-list__item-primary-content">
-              <i class="material-icons  mdl-list__item-icon">chrome_reader_mode</i>
-              Enabled
-            </span>
-            <span class="mdl-list__item-secondary-action">
-              <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="enableButton">
-                <input type="checkbox" id="enableButton" class="mdl-switch__input" checked />
-              </label>
-            </span>
-          </li>
-        </ul>
-
-        <div class="mdl-card__actions mdl-card--border">
-        </div>
-
-        <button id="updateButton" align="center" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onclick="updateConfig()">
-          Update
-        </button>
-
-          <!-- Position Button - Top Right -->
-          <div class="mdl-card__menu">
-            <button id="positionButton"
-                    class="mdl-button mdl-js-button mdl-button--icon">
-              <i class="material-icons">my_location</i>
-            </button>
-          </div>
-          <ul id="positionList" class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
-            for="positionButton">
-          </ul>
-          <!-- End Position Button -->
-    </div>
-
-    <div id="demo-toast-example" class="mdl-js-snackbar mdl-snackbar">
-      <div class="mdl-snackbar__text"></div>
-      <button class="mdl-snackbar__action" type="button"></button>
-    </div>
   </main>
 
 
@@ -130,8 +183,8 @@
 </script>
 <script type="text/javascript">
 <!--
-if (screen.width <= 699) {
-  document.location = "mobile.html";
+if (screen.width >= 699) {
+    //document.location = "index.html";
 }
 //-->
 </script>
