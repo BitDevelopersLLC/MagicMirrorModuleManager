@@ -30,13 +30,22 @@
   }
 
   .page-content {
-    position: absolute;
-    top:0;
-    bottom: 0;
-    left: 0;
-    right: 0;
     margin: auto;
+    padding-top: 0.5cm;
   }
+
+  .mdl-grid {
+  padding: 0!important;
+  margin: auto;
+}
+
+.mdl-cell {
+  background: #bdbdbd;
+  padding: 30px 0;
+  text-align: center;
+  color: #424242;
+  font-weight: bold;
+}
 
   #sortable1, #sortable2, #sortable3 {
     border: 1px solid #eee;
@@ -75,17 +84,17 @@
     <header class="mdl-layout__header">
       <div class="mdl-layout__header-row">
         <!-- Title -->
-        <span class="mdl-layout-title">Title</span>
+        <span class="mdl-layout-title">MMMM</span>
       </div>
       <!-- Tabs -->
       <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
-        <a href="#fixed-tab-1" class="mdl-layout__tab is-active">Modules</a>
-        <a href="#fixed-tab-2" class="mdl-layout__tab">Config</a>
-        <a href="#fixed-tab-3" class="mdl-layout__tab">Positions</a>
+        <a id="firstTab" href="#fixed-tab-1" class="mdl-layout__tab is-active">Modules</a>
+        <a id="secondTab" href="#fixed-tab-2" class="mdl-layout__tab">Config</a>
+        <a id="thirdTab" href="#fixed-tab-3" class="mdl-layout__tab">Position</a>
       </div>
     </header>
     <div class="mdl-layout__drawer">
-      <span class="mdl-layout-title">Title</span>
+      <span class="mdl-layout-title">MMMM</span>
     </div>
     <main class="mdl-layout__content">
 
@@ -93,8 +102,8 @@
       <section class="mdl-layout__tab-panel is-active" id="fixed-tab-1">
         <div align="center" class="page-content">
           <!-- Start Module List Card -->
-          <div class="demo-card-wide mdl-card mdl-shadow--2dp">
-            <ul id="sortable1" class="demo-list-control mdl-list">
+          <div  align="center" class="demo-card-wide mdl-card mdl-shadow--2dp">
+            <ul id="sortable1"  align="center" class="demo-list-control mdl-list">
             <div class="mdl-card__title">
               <h2 class="mdl-card__title-text" text-align="center">Modules</h2>
             </div>
@@ -105,9 +114,9 @@
 
       <!-- Second Tab -->
       <section class="mdl-layout__tab-panel" id="fixed-tab-2">
-        <div class="page-content mdl-grid demo-content">
+        <div align="center" class="page-content">
             <!-- Start Config Card -->
-            <div id="configCard" class="demo-card-wide mdl-card mdl-shadow--2dp">
+            <div  align="center" id="configCard" class="demo-card-wide mdl-card mdl-shadow--2dp">
 
               <div class="mdl-card__title">
                 <h2 class="mdl-card__title-text">Config</h2>
@@ -155,10 +164,56 @@
       </section>
 
       <!-- Third Tab -->
-      <section class="mdl-layout__tab-panel" id="fixed-tab-3">
-        <div class="page-content"><!-- Your content goes here --></div>
-      </section>
+      <section align="center" class="mdl-layout__tab-panel" id="fixed-tab-3">
+        <div align="center" class="page-content">
 
+          <div align="center" class="demo-grid-ruler mdl-grid">
+             <div class="mdl-cell mdl-cell--9-col mdl-cell--9-col-tablet">top_bar</div>
+           </div>
+
+           <div align="center" class="demo-grid-ruler mdl-grid">
+             <div class="mdl-cell mdl-cell--3-col mdl-cell--3-col-tablet">top_left</div>
+             <div class="mdl-cell mdl-cell--3-col mdl-cell--3-col-tablet">top_center</div>
+             <div class="mdl-cell mdl-cell--3-col mdl-cell--3-col-tablet">top_right</div>
+            </div>
+
+           <div align="center" class="demo-grid-ruler mdl-grid">
+              <div class="mdl-cell mdl-cell--9-col mdl-cell--9-col-tablet">upper_third</div>
+            </div>
+
+            <div align="center" class="demo-grid-ruler mdl-grid">
+               <div class="mdl-cell mdl-cell--9-col mdl-cell--9-col-tablet">middle_center</div>
+             </div>
+
+             <div align="center" class="demo-grid-ruler mdl-grid">
+                <div class="mdl-cell mdl-cell--9-col mdl-cell--9-col-tablet">lower_center</div>
+              </div>
+
+             <div align="center" class="demo-grid-ruler mdl-grid">
+               <div class="mdl-cell mdl-cell--3-col mdl-cell--3-col-tablet">bottom_left</div>
+               <div class="mdl-cell mdl-cell--3-col mdl-cell--3-col-tablet">bottom_center</div>
+               <div class="mdl-cell mdl-cell--3-col mdl-cell--3-col-tablet">bottom_right</div>
+              </div>
+
+              <div align="center" class="demo-grid-ruler mdl-grid">
+                 <div class="mdl-cell mdl-cell--9-col mdl-cell--9-col-tablet">bottom_bar</div>
+               </div>
+
+              <!--
+           <div class="demo-grid-2 mdl-grid">
+             <div class="mdl-cell mdl-cell--6-col">6</div>
+             <div class="mdl-cell mdl-cell--4-col">4</div>
+             <div class="mdl-cell mdl-cell--2-col">2</div>
+           </div>
+           <div class="demo-grid-3 mdl-grid">
+             <div class="mdl-cell mdl-cell--6-col mdl-cell--8-col-tablet">6 (8 tablet)</div>
+             <div class="mdl-cell mdl-cell--4-col mdl-cell--6-col-tablet">4 (6 tablet)</div>
+             <div class="mdl-cell mdl-cell--2-col mdl-cell--4-col-phone">2 (4 phone)</div>
+           </div>
+         -->
+
+        </div>
+      </section>
     </main>
   </div>
 
@@ -217,6 +272,7 @@ function checkHash() {
         }
       }
     }
+
     populateConfigCard(findModule(hashName));
   } else {
     console.log("URL Requested, does not contain a known anchor hash.");
@@ -329,7 +385,7 @@ function appendModules() {
         location.hash = ("#" + targetName);
 
         $("li[id=configItem]").remove();
-        setTimeout(function () {populateConfigCard(findModule(targetName)); }, 20);
+        setTimeout(function () {populateConfigCard(findModule(targetName));  document.getElementById("secondTab").click();}, 20);
       }
   });
 }
@@ -342,6 +398,7 @@ function populateConfigCard(mod) {
   currentModule = mod;
 
   if (mod.config != null) {
+    triggerHandicap({enableButton: "enable", updateButton: "disable", positionButton: "enable"});
     populatePositionDropdown();
     var configObjectMap = {};
     for (cfg in mod.config) {
@@ -601,8 +658,8 @@ function populatePositionDropdown() {
 
 appendModules();
 parseModules();
-checkHash();
 triggerHandicap({updateButton: "disable", positionButton: "disable"});
+checkHash();
 </script>
 
 <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
