@@ -49,7 +49,7 @@ var config = {
 			"position": "top_right",
 			"header": "Weather Forecast",
 			"config": {
-				"units": "testing",
+				"units": "Test hi",
 				"location": "Ladera Ranch",
 				"locationID": "5364199",
 				"appid": "0d8cbd2c42f528549ddb896767e82809"

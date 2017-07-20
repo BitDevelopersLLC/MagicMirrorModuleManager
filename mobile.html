@@ -4,12 +4,44 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MMMM</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-  <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-red.min.css" />
+  <link rel="stylesheet" href="./mdl/material.css">
   <script src="./mdl/material.min.js"></script>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
 
   <style>
+
+  .material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;  /* Preferred icon size */
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+
+    /* Support for all WebKit browsers. */
+    -webkit-font-smoothing: antialiased;
+
+    /* Support for Safari and Chrome. */
+    text-rendering: optimizeLegibility;
+
+    /* Support for Firefox. */
+    -moz-osx-font-smoothing: grayscale;
+
+    /* Support for IE. */
+    font-feature-settings: 'liga';
+  }
+
   .demo-card-wide.mdl-card {
     width: 384px;
   }
@@ -67,8 +99,9 @@
   margin-left: auto;
 }
 
-.posClearButton {
-  marigin: auto;
+.more-options {
+  margin-right: 0;
+  margin-left: auto;
 }
 
 
@@ -150,7 +183,7 @@
               <ul id="configList" class="demo-list-control mdl-list">
                 <li class="mdl-list__item" id="superman">
                   <span class="mdl-list__item-primary-content">
-                    <i class="material-icons  mdl-list__item-icon">chrome_reader_mode</i>
+                    <i class="material-icons ">chrome_reader_mode</i>
                     Enabled
                   </span>
                   <span class="mdl-list__item-secondary-action">
@@ -178,6 +211,7 @@
                 <ul id="positionList" class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
                   for="positionButton">
                 </ul>
+
                 <!-- End Position Button -->
           </div>
 
@@ -198,18 +232,7 @@
            </div>
 
            <div  class="demo-grid-2 mdl-grid">
-             <div id="pos-top_left" class="mdl-cell mdl-cell--1-col mdl-button--raised mdl-button--colored">Top Left
-                  <ul class="mdl-menu mdl-js-menu mdl-menu--bottom-right mdl-js-ripple-effect" for="menubtn">
-                    <li class="mdl-menu__item">About</li>
-                    <li class="mdl-menu__item">Message</li>
-                    <li class="mdl-menu__item">Favorite</li>
-                    <li class="mdl-menu__item">Search</li>
-                  </ul>
-                  <button id="menubtn" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
-                    <i class="material-icons" role="presentation">more_vert</i>
-                    <span class="visuallyhidden">show menu</span>
-                  </button>
-             </div>
+             <div id="pos-top_left" class="mdl-cell mdl-cell--1-col mdl-button--raised mdl-button--colored">Top Left</div>
              <div id="pos-top_center" class="mdl-cell mdl-cell--1-col mdl-button--raised mdl-button--colored">Top Center</div>
              <div id="pos-top_right" class="mdl-cell mdl-cell--1-col mdl-button--raised mdl-button--colored">Top Right</div>
             </div>
@@ -242,9 +265,9 @@
     </main>
   </div>
 <script src="config.js"></script>
-<script src="/socket.io/socket.io.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
 <script>
-  var socket = io('http://localhost:8125', {secure: true});
+  var socket = io('http://magicmirror.localtunnel.me', {transports: ['websocket', 'polling', 'flashsocket']});
 
   function sendOutData(data) {
       //console.log(data);
@@ -278,20 +301,60 @@ if (screen.width >= 699) {
   var dynamicConfig = {};
 
 
+  // <!-- Right aligned menu below button -->
+  // <button id="demo-menu-lower-right"
+  //         class="mdl-button mdl-js-button mdl-button--icon">
+  //   <i class="material-icons">more_vert</i>
+  // </button>
+  //
+  // <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
+  //     for="demo-menu-lower-right">
+  //   <li class="mdl-menu__item">Some Action</li>
+  //   <li class="mdl-menu__item">Another Action</li>
+  //   <li disabled class="mdl-menu__item">Disabled Action</li>
+  //   <li class="mdl-menu__item">Yet Another Action</li>
+  // </ul>
+
+
+
 function setupPositionTab() {
   var allPositions = ["top_bar", "bottom_bar", "top_left", "bottom_left", "top_right", "bottom_right", "top_center", "bottom_center", "upper_third", "middle_center", "lower_center"];
 
   for (pos in allPositions) {
     var positionCell = document.getElementById("pos-" + allPositions[pos]);
 
-    var posClearButton = document.createElement("button");
-    var posClearButtonIcon = document.createElement("i");
-    posClearButton.className = "mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--fab mdl-button--mini-fab";
-    posClearButtonIcon.className = "material-icons";
-    posClearButtonIcon.innerHTML = "clear";
-    posClearButton.style = "posClearButton";
-    posClearButton.appendChild(posClearButtonIcon);
-    //positionCell.appendChild(posClearButton);
+    var moreOptionsButton = document.createElement("button");
+    var moreOptionsButtonIcon = document.createElement("i");
+    var moreOptionsButtonSpan = document.createElement("span");
+      var optionsList = document.createElement("ul");
+        var deleteLI = document.createElement("li");
+
+    positionCell.style.backgroundColor = "#ec4174";
+
+    optionsList.className = "mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect";
+    var string = ("for-" + allPositions[pos]);
+    optionsList.setAttribute("for", string);
+
+          deleteLI.className = "mdl-menu__item";
+          deleteLI.innerHTML = "Delete";
+          optionsList.appendChild(deleteLI);
+
+    moreOptionsButton.className = "mdl-button mdl-js-button mdl-button--icon";
+    moreOptionsButton.id = (string);
+
+      moreOptionsButtonSpan.className = "visuallyhidden";
+      moreOptionsButtonSpan.innerHTML = "show menu";
+
+      moreOptionsButtonIcon.className = "material-icons";
+      moreOptionsButtonIcon.innerHTML = "more_vert";
+
+      moreOptionsButton.appendChild(moreOptionsButtonIcon);
+      moreOptionsButton.appendChild(moreOptionsButtonSpan);
+
+    //console.log(optionsList);
+    //console.error(moreOptionsButton);
+    //moreOptionsButtonSpan.appendChild(optionsList);
+    positionCell.appendChild(moreOptionsButton);
   }
 
 }
@@ -307,7 +370,7 @@ function checkHash() {
     for (li in modules) {
       if (modules[li].tagName == 'LI') {
         if (modules[li].innerHTML == hashName) {
-          modules[li].style.color = "#ec4174";
+          modules[li].style.backgroundColor = "#ec4174";
         }
       }
     }
@@ -409,10 +472,10 @@ function appendModules() {
         for (li in this.childNodes) {
           if (this.childNodes[li].tagName == 'LI') {
             //console.log(this.childNodes[li]);
-            this.childNodes[li].style.color = "#FFFFFF";
+            this.childNodes[li].style.backgroundColor = "#3b5bb4";
           }
         }
-        e.target.parentNode.style.color = "#ec4174";
+        e.target.parentNode.style.backgroundColor = "#ec4174";
         var targetName = arrayModules[e.target.parentNode.id];
 
         ///Hashing!
@@ -637,7 +700,7 @@ function populatePositionDropdown() {
         }
       }
   });
-  console.log(dynamicConfig);
+  //console.log(dynamicConfig);
 }
 
   function findModule(name) {
@@ -689,9 +752,9 @@ function populatePositionDropdown() {
         $('#sortable1').empty().html(order);
       }
 
-    function snackBar(msg) {
+    function snackBar(msg2) {
         var snackbarContainer = document.querySelector('#demo-toast-example');
-        var data = {message: msg};
+        var data = {message: msg2};
         snackbarContainer.MaterialSnackbar.showSnackbar(data);
     }
 
