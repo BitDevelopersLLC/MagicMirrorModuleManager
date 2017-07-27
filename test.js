@@ -36,10 +36,10 @@ var config = {
 		},
 		{
 			"module": "currentweather",
-			"position": "top_right",
+			"position": "positionItem",
 			"config": {
-				"units": "imperial",
-				"location": "Ladera Ranch",
+				"units": "tester",
+				"location": "Los Angeles",
 				"locationID": "5364199",
 				"appid": "0d8cbd2c42f528549ddb896767e82809"
 			}
@@ -49,7 +49,7 @@ var config = {
 			"position": "top_right",
 			"header": "Weather Forecast",
 			"config": {
-				"units": "Test hi",
+				"units": "imperial",
 				"location": "Ladera Ranch",
 				"locationID": "5364199",
 				"appid": "0d8cbd2c42f528549ddb896767e82809"
@@ -59,13 +59,7 @@ var config = {
 			"module": "newsfeed",
 			"position": "bottom_bar",
 			"config": {
-				"feeds": [
-					{
-						"title": "New York Times",
-						"url": "http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml"
-					}
-				],
-				"showSourceTitle": true,
+				"showSourceTitle": "true",
 				"showPublishDate": true
 			}
 		}

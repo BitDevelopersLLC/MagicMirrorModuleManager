@@ -4,15 +4,24 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MMMM</title>
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet">
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"> -->
   <link rel="stylesheet" href="./mdl/material.css">
   <script src="./mdl/material.min.js"></script>
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet">
 
   <style>
+
+  @font-face {
+     font-family: 'Material Icons';
+     font-style: normal;
+     font-weight: 400;
+     src: url(material-design-icons/iconfont/MaterialIcons-Regular.eot); /* For IE6-8 */
+     src: local('Material Icons'),
+          local('MaterialIcons-Regular'),
+          url(material-design-icons/iconfont/MaterialIcons-Regular.woff2) format('woff2'),
+          url(material-design-icons/iconfont/MaterialIcons-Regular.woff) format('woff'),
+          url(material-design-icons/iconfont/MaterialIcons-Regular.ttf) format('truetype');
+  }
 
   .material-icons {
     font-family: 'Material Icons';
@@ -20,8 +29,6 @@
     font-style: normal;
     font-size: 24px;  /* Preferred icon size */
     display: inline-block;
-    width: 1em;
-    height: 1em;
     line-height: 1;
     text-transform: none;
     letter-spacing: normal;
@@ -31,7 +38,6 @@
 
     /* Support for all WebKit browsers. */
     -webkit-font-smoothing: antialiased;
-
     /* Support for Safari and Chrome. */
     text-rendering: optimizeLegibility;
 
@@ -41,6 +47,7 @@
     /* Support for IE. */
     font-feature-settings: 'liga';
   }
+
 
   .demo-card-wide.mdl-card {
     width: 384px;
@@ -73,12 +80,15 @@
 
 .mdl-cell {
   background: #FFF0F5;
-  padding-bottom: calc(1vh * 3.2);
-  padding-top: calc(1vh * 3.2);
+  padding-bottom: calc(1vh * 10);
+  padding-top: calc(1vh * 0);
   text-align: center;
+  text-transform: none;
+  font-size: 3vw;
   color: #000000;
-  font-weight: bold;
+  font-weight: lighter;
   margin: 7px;
+  cursor: pointer;
 }
 
 .cell--3-col-tablet.mdl-cell--3-col-tablet {
@@ -124,15 +134,8 @@
 
 
   </style>
-  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-  <script>
-  $( function() {
-    $( "#sortable1, #sortable2, #sortable3" ).sortable({
-      connectWith: ".connectedSortable"
-    }).disableSelection();
-  } );
-  </script>
+  <!-- <script src="https://code.jquery.com/jquery-1.12.4.js"></script> -->
+  <script src="jquery.js"></script>
 </head>
 
 <body>
@@ -228,35 +231,35 @@
           <div>
 
           <div  class="demo-grid-ruler mdl-grid">
-              <div id="pos-top_bar" class="mdl-cell mdl-cell--3-col mdl-cell--9-col-tablet mdl-button--raised mdl-button--colored">Top Bar</div>
+              <div id="pos-top_bar" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored mdl-cell mdl-cell--3-col mdl-cell--9-col-tablet">Top Bar</div>
            </div>
 
            <div  class="demo-grid-2 mdl-grid">
-             <div id="pos-top_left" class="mdl-cell mdl-cell--1-col mdl-button--raised mdl-button--colored">Top Left</div>
-             <div id="pos-top_center" class="mdl-cell mdl-cell--1-col mdl-button--raised mdl-button--colored">Top Center</div>
-             <div id="pos-top_right" class="mdl-cell mdl-cell--1-col mdl-button--raised mdl-button--colored">Top Right</div>
+             <div id="pos-top_left" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored mdl-cell mdl-cell--1-col">Top Left</div>
+             <div id="pos-top_center" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored mdl-cell mdl-cell--1-col">Top Center</div>
+             <div id="pos-top_right" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored mdl-cell mdl-cell--1-col">Top Right</div>
             </div>
 
            <div  class="demo-grid-ruler mdl-grid">
-              <div id="pos-upper_third" class="mdl-cell mdl-cell--3-col mdl-cell--9-col-tablet mdl-button--raised mdl-button--colored">Upper Third</div>
+              <div id="pos-upper_third" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored mdl-cell mdl-cell--3-col mdl-cell--9-col-tablet">Upper Third</div>
             </div>
 
             <div  class="demo-grid-ruler mdl-grid">
-               <div id="pos-middle_center" class="mdl-cell mdl-cell--3-col mdl-cell--9-col-tablet mdl-button--raised mdl-button--colored">Middle Center</div>
+               <div id="pos-middle_center" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored mdl-cell mdl-cell--3-col mdl-cell--9-col-tablet">Middle Center</div>
              </div>
 
              <div  class="demo-grid-ruler mdl-grid">
-                <div id="pos-lower_center" class="mdl-cell mdl-cell--3-col mdl-cell--9-col-tablet mdl-button--raised mdl-button--colored">Lower Center</div>
+                <div id="pos-lower_center" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored mdl-cell mdl-cell--3-col mdl-cell--9-col-tablet">Lower Center</div>
               </div>
 
              <div  class="demo-grid-2 mdl-grid">
-               <div id="pos-bottom_left" class="mdl-cell mdl-cell--1-col mdl-button--raised mdl-button--colored">Bottom Left</div>
-               <div id="pos-bottom_center" class="mdl-cell mdl-cell--1-col mdl-button--raised mdl-button--colored">Bottom Center</div>
-               <div id="pos-bottom_right" class="mdl-cell mdl-cell--1-col mdl-button--raised mdl-button--colored">Bottom Right</div>
+               <div id="pos-bottom_left" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored mdl-cell mdl-cell--1-col">Bottom Left</div>
+               <div id="pos-bottom_center" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored mdl-cell mdl-cell--1-col">Bottom Center</div>
+               <div id="pos-bottom_right" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored mdl-cell mdl-cell--1-col">Bottom Right</div>
               </div>
 
               <div  class="demo-grid-ruler mdl-grid">
-                 <div id="pos-bottom_bar" class="mdl-cell mdl-cell--3-col mdl-cell--9-col-tablet mdl-button--raised mdl-button--colored">Bottom Bar</div>
+                 <div id="pos-bottom_bar" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored mdl-cell mdl-cell--3-col mdl-cell--9-col-tablet">Bottom Bar</div>
                </div>
 
           </div>
@@ -264,10 +267,14 @@
       </section>
     </main>
   </div>
-<script src="config.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+<script src="test.js"></script>
+<script src="socket.io.js"> </script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script> -->
 <script>
-  var socket = io('http://magicmirror.localtunnel.me', {transports: ['websocket', 'polling', 'flashsocket']});
+console.error("Do you have internet?");
+//  CHANGE THIS    var socket = io('http://magicmirror.localtunnel.me', {transports: ['websocket', 'polling', 'flashsocket']});
+// Run some tests here in order to determine if you want to open the socket on magicmirror URL or local host.
+  var socket = io('http://localhost:8125');
 
   function sendOutData(data) {
       //console.log(data);
@@ -290,7 +297,10 @@ if (screen.width >= 699) {
 
   var rawModules = config.modules;
   var arrayModules = [];
+
   var mapModulePositions = {};
+  var mapModulePositionsReverse = {};
+
   var updatedPosition = null;
   var currentPosition = null;
   var updateStatic = false;
@@ -300,25 +310,41 @@ if (screen.width >= 699) {
   var fullDynamicConfig = config;
   var dynamicConfig = {};
 
+function updateConfigUI() {
+  var hashName = window.location.hash.substr(1, window.location.hash.lastIndexOf(''));
+    $("li[id=configItem]").remove();
+    $("li[id=positionItem]").remove();
+    var icon = document.getElementById("positionButton");
+    icon.style.color = "#FFFFFF";
+    populateConfigCard(findModule(hashName));
+    snackBar(hashName + ", module has been updated.");
+}
 
-  // <!-- Right aligned menu below button -->
-  // <button id="demo-menu-lower-right"
-  //         class="mdl-button mdl-js-button mdl-button--icon">
-  //   <i class="material-icons">more_vert</i>
-  // </button>
-  //
-  // <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
-  //     for="demo-menu-lower-right">
-  //   <li class="mdl-menu__item">Some Action</li>
-  //   <li class="mdl-menu__item">Another Action</li>
-  //   <li disabled class="mdl-menu__item">Disabled Action</li>
-  //   <li class="mdl-menu__item">Yet Another Action</li>
-  // </ul>
+// <!-- Right aligned menu below button -->
+// <button id="demo-menu-lower-right"
+//         class="mdl-button mdl-js-button mdl-button--icon">
+//   <i class="material-icons">more_vert</i>
+// </button>
+//
+// <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
+//     for="demo-menu-lower-right">
+//   <li class="mdl-menu__item">Some Action</li>
+//   <li class="mdl-menu__item">Another Action</li>
+//   <li disabled class="mdl-menu__item">Disabled Action</li>
+//   <li class="mdl-menu__item">Yet Another Action</li>
+// </ul>
 
+
+<!-- Flat button with ripple -->
+// <button class="mdl-button mdl-js-button mdl-js-ripple-effect">
+//   Button
+// </button>
 
 
 function setupPositionTab() {
   var allPositions = ["top_bar", "bottom_bar", "top_left", "bottom_left", "top_right", "bottom_right", "top_center", "bottom_center", "upper_third", "middle_center", "lower_center"];
+  var takenPositions = {};
+
 
   for (pos in allPositions) {
     var positionCell = document.getElementById("pos-" + allPositions[pos]);
@@ -329,8 +355,6 @@ function setupPositionTab() {
       var optionsList = document.createElement("ul");
         var deleteLI = document.createElement("li");
 
-    positionCell.style.backgroundColor = "#ec4174";
-
     optionsList.className = "mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect";
     var string = ("for-" + allPositions[pos]);
     optionsList.setAttribute("for", string);
@@ -339,22 +363,22 @@ function setupPositionTab() {
           deleteLI.innerHTML = "Delete";
           optionsList.appendChild(deleteLI);
 
-    moreOptionsButton.className = "mdl-button mdl-js-button mdl-button--icon";
+    moreOptionsButton.className = "mdl-button mdl-js-button mdl-js-ripple-effect";
     moreOptionsButton.id = (string);
 
-      moreOptionsButtonSpan.className = "visuallyhidden";
-      moreOptionsButtonSpan.innerHTML = "show menu";
-
-      moreOptionsButtonIcon.className = "material-icons";
-      moreOptionsButtonIcon.innerHTML = "more_vert";
-
-      moreOptionsButton.appendChild(moreOptionsButtonIcon);
-      moreOptionsButton.appendChild(moreOptionsButtonSpan);
+      moreOptionsButton.innerHTML = ". . .";
 
     //console.log(optionsList);
     //console.error(moreOptionsButton);
     //moreOptionsButtonSpan.appendChild(optionsList);
     positionCell.appendChild(moreOptionsButton);
+
+    if (mapModulePositionsReverse[allPositions[pos]]) {
+      var takenModuleName = document.createElement("p");
+      positionCell.style.backgroundColor = "#ec4174";
+      takenModuleName.innerHTML = mapModulePositionsReverse[allPositions[pos]];
+      positionCell.appendChild(takenModuleName);
+    }
   }
 
 }
@@ -381,7 +405,7 @@ function checkHash() {
   }
 }
 
-function triggerHandicap(parts) {
+function triggerHandicap(parts) {111
   var updateButton = document.getElementById("updateButton");
   var configCard = document.getElementById("configCard");
   var partKeys = Object.keys(parts);
@@ -410,20 +434,17 @@ function triggerHandicap(parts) {
 
 
 function updateConfig() {
-  console.error(config);
-  console.log(fullDynamicConfig);
   if (Object.keys(dynamicConfig).length > 0) {
     if (dynamicConfig.position != null) {
       fullDynamicConfig.modules[findModulePosition(currentModule.module)].position = dynamicConfig.position;
       delete dynamicConfig.position;
     }
     for (cfg in dynamicConfig) {
-      console.error("CFG: -> " + cfg);
       fullDynamicConfig.modules[findModulePosition(currentModule.module)].config[cfg] = dynamicConfig[cfg];
     }
     checkConfigCardInputs();
     var data = ("var config = " + JSON.stringify(fullDynamicConfig, null, "\t") + ";" + "\n if (typeof module !== 'undefined') {module.exports = config;}");
-    setTimeout(function () { sendOutData(data, currentModule); }, 5);
+    setTimeout(function () { sendOutData(data, currentModule); updateConfigUI(); }, 5);
   } else { console.error("This was caused by updateConfig() func being called with no config changes being made, yet updateButton was enabled.") }
 
 }
@@ -487,7 +508,7 @@ function appendModules() {
         location.hash = ("#" + targetName);
 
         $("li[id=configItem]").remove();
-        setTimeout(function () {populateConfigCard(findModule(targetName));  document.getElementById("secondTab").click();}, 20);
+        setTimeout(function () { populateConfigCard(findModule(targetName));  document.getElementById("secondTab").click();}, 20);
       }
   });
 }
@@ -669,7 +690,7 @@ function populatePositionDropdown() {
       var li = document.createElement("li");
       li.className = "mdl-menu__item";
       li.innerHTML = validPositions[pos];
-      li.id = validPositions[pos];
+      li.id = "positionItem";
       ul.appendChild(li);
   }
 
@@ -725,6 +746,7 @@ function populatePositionDropdown() {
     for (mod in rawModules) {
       if (rawModules[mod].position != null) {
         mapModulePositions[rawModules[mod].module] = rawModules[mod].position;
+        mapModulePositionsReverse[rawModules[mod].position] = rawModules[mod].module;
       }
     }
   }
@@ -742,16 +764,6 @@ function populatePositionDropdown() {
       return allPositions;
   }
 
-  function sortClick() {
-      var sortableItems = $('#sortable1').find('li');
-		    var order = ['Calendar', 'Clock', 'Alarm Clock', 'Weather'];
-        var orderedItems = $.map(order, function(value) {
-          return sortableItems.get(value);
-        });
-
-        $('#sortable1').empty().html(order);
-      }
-
     function snackBar(msg2) {
         var snackbarContainer = document.querySelector('#demo-toast-example');
         var data = {message: msg2};
@@ -765,7 +777,7 @@ triggerHandicap({updateButton: "disable", positionButton: "disable"});
 checkHash();
 </script>
 
-<script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+<script src="node_modules/material-components-web/dist/material-components-web.min.js"></script>
 <script>window.mdc.autoInit();</script>
 
  <!--
