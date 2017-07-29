@@ -14,7 +14,7 @@ var config = {
 		},
 		{
 			"module": "updatenotification",
-			"position": "top_bar"
+			"position": "top_left"
 		},
 		{
 			"module": "clock",
@@ -23,7 +23,7 @@ var config = {
 		{
 			"module": "calendar",
 			"header": "US Holidays",
-			"position": "top_left",
+			"position": "top_bar",
 			"config": {
 				"maximumNumberOfDays": 90,
 				"calendars": [
@@ -36,17 +36,17 @@ var config = {
 		},
 		{
 			"module": "currentweather",
-			"position": "positionItem",
+			"position": "top_right",
 			"config": {
-				"units": "tester",
-				"location": "Los Angeles",
+				"units": "imperial",
+				"location": "Ladera Ranch",
 				"locationID": "5364199",
 				"appid": "0d8cbd2c42f528549ddb896767e82809"
 			}
 		},
 		{
 			"module": "weatherforecast",
-			"position": "top_right",
+			"position": "top_center",
 			"header": "Weather Forecast",
 			"config": {
 				"units": "imperial",
@@ -57,9 +57,15 @@ var config = {
 		},
 		{
 			"module": "newsfeed",
-			"position": "bottom_bar",
+			"position": "bottom_right",
 			"config": {
-				"showSourceTitle": "true",
+				"feeds": [
+					{
+						"title": "New York Times",
+						"url": "http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml"
+					}
+				],
+				"showSourceTitle": true,
 				"showPublishDate": true
 			}
 		}
