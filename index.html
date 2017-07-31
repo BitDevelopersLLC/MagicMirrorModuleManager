@@ -176,6 +176,28 @@
               <h2 class="mdl-card__title-text" text-align="center">Modules</h2>
             </div>
             </ul>
+            <button id="add-module" type="button" class="mdl-button mdl-button--colored">Add Module</button>
+            <dialog class="mdl-dialog">
+              <h1 id="dialogTitle" class="mdl-dialog__title">Add New Module</h1>
+              <div class="mdl-dialog__content">
+                <p id="dialogInstructions">
+                  Paste the module's GitHub URL:
+                </p>
+                <!-- Simple Textfield -->
+                <form action="#">
+                  <div class="mdl-textfield mdl-js-textfield">
+                    <input class="mdl-textfield__input" type="text" id="dialogTextField">
+                    <label class="mdl-textfield__label" for="githubTextField" id="dialogLabel">https://github.com/MichMich/MagicMirror/tree/develop/modules/default/clock</label>
+                  </div>
+                </form>
+
+              </div>
+              <div class="mdl-dialog__actions">
+                <button type="button" id="dialogNextButton" class="mdl-button">Next</button>
+                <button type="button" class="mdl-button close">Cancel</button>
+                <div id="dialogProgress" class="mdl-progress mdl-js-progress"></div>
+              </div>
+            </dialog>
           </div>
         </div>
       </section>
@@ -225,7 +247,7 @@
                 <!-- End Position Button -->
           </div>
 
-          <div id="demo-toast-example" class="mdl-js-snackbar mdl-snackbar">
+          <div id="tab-2" class="mdl-js-snackbar mdl-snackbar">
             <div class="mdl-snackbar__text"></div>
             <button class="mdl-snackbar__action" type="button"></button>
           </div>
@@ -276,23 +298,16 @@
                </div>
 
           </div>
+          <div id="tab-3" class="mdl-js-snackbar mdl-snackbar">
+            <div class="mdl-snackbar__text"></div>
+            <button class="mdl-snackbar__action" type="button"></button>
+          </div>
         </div>
       </section>
     </main>
   </div>
 <script src="test.js"></script>
 <script src="socket.io.js"> </script>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script> -->
-<script>
-console.error("Do you have internet?");
-//  CHANGE THIS    var socket = io('http://magicmirror.localtunnel.me', {transports: ['websocket', 'polling', 'flashsocket']});
-// Run some tests here in order to determine if you want to open the socket on magicmirror URL or local host.
-  var socket = io('http://localhost:1984');
-
-  function sendOutData(data) {
-      socket.emit('configUpdate', data);
-  }
-</script>
 <script type="text/javascript">
 <!--
 if (screen.width >= 699) {
@@ -308,7 +323,14 @@ if (screen.width >= 699) {
 }
 //-->
 </script>
+
 <script>
+
+/**
+ * @file MMMM JavaScript Handler
+ * @author Mario Figueroa <mario@thermalwebcreations.com>
+ * @version 0.1 Alpha
+ */
 
   var rawModules = config.modules;
   var arrayModules = [];
@@ -329,531 +351,725 @@ if (screen.width >= 699) {
   var selectedPosition = null;
   var takenPositionsDynamic = mapModulePositions;
 
-function updateConfigUI() {
-  var hashName = window.location.hash.substr(1, window.location.hash.lastIndexOf(''));
-    $("li[id=configItem]").remove();
-    $("li[id=positionItem]").remove();
-    var icon = document.getElementById("positionButton");
-    icon.style.color = "#FFFFFF";
-    populateConfigCard(findModule(hashName));
-    snackBar(hashName + ", module has been updated.");
-}
+    /**
+    * Pre-Initialization Functions
+    *
+    * @function {Void} [v0.1] checkHash - Check the URL Hash to see if the client has already selected a module.
+    * @function {Void} [v0.1] parseModules - Concise description of the tag.
+    */
 
-function setupPositionTab() {
-  var allPositions =
-  ["top_bar",
-   "bottom_bar",
-    "top_left",
-     "bottom_left",
-      "top_right",
-       "bottom_right",
-        "top_center",
-         "bottom_center",
-          "upper_third",
-           "middle_center",
-            "lower_center"];
+        /**
+        * CheckHash - Search for a module in rawModules by it's name. [v0.1]
+        *
+        * @executes {Function} populateConfigCard() - If URL does contain a valid hash then it will load up the respective config in Config-Tab.
+        * @throws {Error} hashNameDNE - If the URL has a hashname that can't be found as a module it will throw an exception.
+        * @logging {Info} urlDNCHash - If the URL DNC (Does Not Contain) a hash it will just log it.
+        */
+        function checkHash() {
+          var href = window.location.href;
+            if(href.indexOf("#") > 0) {
+              // NOTE: Dissect hash from URL and store as hashName.
+              var hashName = window.location.hash.substr(1, window.location.hash.lastIndexOf(''));
+              var modules = document.getElementById('sortable1').childNodes;
 
-
-  for (pos in allPositions) {
-    var positionCell = document.getElementById("pos-" + allPositions[pos]);
-
-    var moreOptionsButtonDiv = document.createElement("div");
-    var moreOptionsButton = document.createElement("button");
-    var moreOptionsButtonIcon = document.createElement("i");
-    var moreOptionsButtonSpan = document.createElement("span");
-      var optionsList = document.createElement("ul");
-        var deleteLI = document.createElement("li");
-
-    optionsList.className = "mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect";
-    var string = ("for-" + allPositions[pos]);
-    optionsList.setAttribute("for", string);
-
-          deleteLI.className = "mdl-menu__item";
-          deleteLI.innerHTML = "Delete";
-          optionsList.appendChild(deleteLI);
-
-    moreOptionsButton.className = "mdl-button mdl-js-button mdl-js-ripple-effect";
-    moreOptionsButton.id = (string);
-    moreOptionsButton.style.color = "#FFFFFF";
-    moreOptionsButton.style.fontSize = "12px";
-    moreOptionsButton.style.lineHeight = "24px";
-
-      moreOptionsButton.innerHTML = ". . .";
-
-    // NOTE: If position cell is taken by a module on-load
-    if (mapModulePositionsReverse[allPositions[pos]]) {
-      var takenModuleName = document.createElement("p");
-      positionCell.style.backgroundColor = "#ec4174";
-      takenModuleName.style.lineHeight = "10px";
-      takenModuleName.style.marginBottom = "-10px";
-      takenModuleName.innerHTML = mapModulePositionsReverse[allPositions[pos]];
-      positionCell.appendChild(takenModuleName);
-    }
-    // NOTE: If not, we will still put in takenModuleName but will just be a placeholder.
-    else {
-      var takenModuleName = document.createElement("p");
-      takenModuleName.style.lineHeight = "10px";
-      takenModuleName.style.marginBottom = "-10px";
-      takenModuleName.innerHTML = "";
-      positionCell.appendChild(takenModuleName);
-    }
-
-    positionCell.onclick = function () {
-      if (selectedPosition != null) {
-        var selectedPositionCell = document.getElementById(selectedPosition);
-        selectedPositionCell.style.filter = "brightness(100%)";
-        selectedPosition = null;
-
-        var swapModuleName = this.childNodes[1].innerHTML;
-        var pinkColor = "#ec4174";
-        var blueColor = "#3b5bb4";
-
-        // NOTE: The secondly clicked cell was pink.
-        if (this.style.backgroundColor == "rgb(236, 65, 116)") {
-          // NOTE: The initially clicked cell was pink & the secondly clicked.
-          if (selectedPositionCell.style.backgroundColor == "rgb(236, 65, 116)") {
-               this.childNodes[1].innerHTML = selectedPositionCell.childNodes[1].innerHTML;
-               selectedPositionCell.childNodes[1].innerHTML = swapModuleName;
-               takenPositionsDynamic[this.childNodes[1].innerHTML] = this.id.substr(4);
-               takenPositionsDynamic[selectedPositionCell.childNodes[1].innerHTML] = selectedPositionCell.id.substr(4);
+              if (findModule(hashName)) {
+                for (li in modules) {
+                  if (modules[li].tagName == 'LI') {
+                    if (modules[li].innerHTML == hashName) {
+                      // NOTE: Paint previously selected module to pink.
+                      modules[li].style.backgroundColor = "#ec4174";
+                    }
+                  }
+                }
+                // NOTE: Load previously selected module, in Config-Tab.
+                populateConfigCard(findModule(hashName));
+              } else {
+                // NOTE: Throw exception, hashNameDNE.
+                console.error("Client Requested a hashname which doesn't exist.");
+              }
+            } else {
+              // NOTE: Log, URL does not contain hash.
+              console.log("URL Requested, does not contain a known anchor hash.");
+            }
           }
-          // NOTE: The initially clicked cell wasn't pink, but the second was.
-          else {
-            this.childNodes[1].innerHTML = selectedPositionCell.childNodes[1].innerHTML;
-            selectedPositionCell.childNodes[1].innerHTML = swapModuleName;
-            selectedPositionCell.style.backgroundColor = pinkColor;
-            this.style.backgroundColor = blueColor;
-            takenPositionsDynamic[selectedPositionCell.childNodes[1].innerHTML] = selectedPositionCell.id.substr(4);
-          }
-        }
-        else {
-          // NOTE: The secondly clicked cell wasn't pink, but the initial was.
-          if (selectedPositionCell.style.backgroundColor == "rgb(236, 65, 116)") {
-            this.childNodes[1].innerHTML = selectedPositionCell.childNodes[1].innerHTML;
-            selectedPositionCell.childNodes[1].innerHTML = swapModuleName;
-            selectedPositionCell.style.backgroundColor = blueColor;
-            this.style.backgroundColor = pinkColor;
-            takenPositionsDynamic[this.childNodes[1].innerHTML] = this.id.substr(4);
-          } else {
-            // NOTE: Both selectedPositionCell's were Blue aka no point in commiting the swap.
-            console.log("Client selected two position cells that are not set.");
+
+        /**
+        * Parse Modules - Search for a module in rawModules by it's name. [v0.1]
+        *
+        * @set {Variable} Sets up an object (mapModulePositions) to contain all modules with a configurable position.
+          * @format Keys = ["moduleName", "moduleName", ...], Values = ["modulePosition", "modulePosition", ...]
+        * @set {Variable} Sets up an object (mapModulePositionsReverse) like it's parent (mapModulePositions) but keys/values flipped.
+          * @format Keys = ["modulePosition", "modulePosition", ...], Values = ["moduleName", "moduleName", ...]
+        */
+        function parseModules() {
+          for (mod in rawModules) {
+            if (rawModules[mod].position != null) {
+              mapModulePositions[rawModules[mod].module] = rawModules[mod].position;
+              mapModulePositionsReverse[rawModules[mod].position] = rawModules[mod].module;
+            }
           }
         }
 
-      } else {
-        if (this.style.backgroundColor == "rgb(236, 65, 116)") {
-          this.style.filter = "drop-shadow(9px 9px 9px rgba(224, 88, 122, 1)) brightness(105%)";
-        } else {
-          this.style.filter = "drop-shadow(9px 9px 9px rgba(58, 89, 176, 1)) brightness(105%)";
-        }
-        selectedPosition = this.id;
-      }
-      console.log(takenPositionsDynamic);
-    }
-  }
-
-}
-
-function updateConfigPositions() {
-    for (pos in takenPositionsDynamic) {
-      fullDynamicConfig.modules[findModulePosition(pos)].position = takenPositionsDynamic[pos];
-    }
-    var data = ("var config = " + JSON.stringify(fullDynamicConfig, null, "\t") + ";" + "\n if (typeof module !== 'undefined') {module.exports = config;}");
-    setTimeout(function () { sendOutData(data, currentModule);   console.log("Client has pushed a positions config change."); }, 5);
-}
-
-
-function checkHash() {
-  var href = window.location.href;
-  if(href.indexOf("#") > 0) {
-    var hashName = window.location.hash.substr(1, window.location.hash.lastIndexOf(''));
-    var modules = document.getElementById('sortable1').childNodes;
-
-    if (findModule(hashName)) {
-    //Need to add style color to the preselected thing
-    //e.target.parentNode.style.color = "#ec4174";
-    for (li in modules) {
-      if (modules[li].tagName == 'LI') {
-        if (modules[li].innerHTML == hashName) {
-          modules[li].style.backgroundColor = "#ec4174";
-        }
-      }
-    }
-
-      populateConfigCard(findModule(hashName));
-    } else {
-      console.error("Client Requested a hashname which doesn't exist.");
-    }
-  } else {
-    console.log("URL Requested, does not contain a known anchor hash.");
-  }
-}
-
-function triggerHandicap(parts) {111
-  var updateButton = document.getElementById("updateButton");
-  var configCard = document.getElementById("configCard");
-  var partKeys = Object.keys(parts);
-
-  for (part in partKeys) {
-    var partElement = document.getElementById(partKeys[part]);
-
-    switch (parts[partKeys[part]]) {
-        case "disable":
-            partElement.disabled = true;
-            break;
-        case "enable":
-            partElement.disabled = false;
-            break;
-        case "show":
-            partElement.style.display = "initial";
-            break;
-        case "hide":
-            partElement.style.display = "none";
-            break;
-        default:
-            console.error("triggerHandicap() was called with key, " + parts[partKeys[part]] + " but the key's value which was passed didn't satisfy any elements. Try, [disable|enable|show|hide]");
-    }
-  }
-}
-
-
-function updateConfig() {
-  if (Object.keys(dynamicConfig).length > 0) {
-    if (dynamicConfig.position != null) {
-      fullDynamicConfig.modules[findModulePosition(currentModule.module)].position = dynamicConfig.position;
-      delete dynamicConfig.position;
-    }
-    for (cfg in dynamicConfig) {
-      fullDynamicConfig.modules[findModulePosition(currentModule.module)].config[cfg] = dynamicConfig[cfg];
-    }
-    checkConfigCardInputs();
-    var data = ("var config = " + JSON.stringify(fullDynamicConfig, null, "\t") + ";" + "\n if (typeof module !== 'undefined') {module.exports = config;}");
-    setTimeout(function () { sendOutData(data, currentModule); updateConfigUI(); }, 5);
-  } else { console.error("This was caused by updateConfig() func being called with no config changes being made, yet updateButton was enabled.") }
-}
-
-function clearConfig() {
-  var configCard = document.getElementById("configList");
-
-  if (configCard.childNodes.length > 1) {
-    for (li in configCard.childNodes) {
-        if (configCard.childNodes[li].id == "configItem") {
-          var input = configCard.childNodes[li].childNodes[1].childNodes[0].childNodes[0].value;
-          input = null;
-          triggerHandicap({updateButton: "disable", position});
-        }
-      }
-    }
-}
+    /**
+    * End of, Pre-Initialization Functions
+    */
 
 
 
-function appendModules() {
-  var ul = document.getElementById("sortable1");
-  // Sortable 1 Variable list
-  var buttonWidthSync = "180px";
-  var arryNumber = -1;
+    /**
+    * Utility Functions
+    *
+    * @function {Object} [v0.1] findModule() - Search for a module in rawModules by it's name.
+    * @function {Object} [v0.1] findModulePosition() - Search for a module's position in the array rawModules.
+    * @function {Void}   [v0.1] snackBar() - Overlays a message on the bottom of the Client's screen.
+    * @function {Array}  [v0.1] positionsNotTaken() - Loop throught all rawModules positions and take them away from all possible positions; and then return one's left.
+    */
 
-
-  for (mod in rawModules) {
-    var li = document.createElement("li");
-    var btn = document.createElement("button");
-    li.appendChild(btn);
-    li.className = "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored";
-    li.innerHTML = rawModules[mod].module;
-    li.style = "cursor:pointer";
-    li.style.fontSize = "15px";
-    li.style.width = buttonWidthSync;
-    li.style.textAlign = "center";
-    arrayModules.push(rawModules[mod].module);
-    arryNumber = arryNumber + 1;
-    li.id = arryNumber;
-    ul.appendChild(li);
-  }
-  ul.addEventListener('click', function(e) {
-      if (e.target.tagName == 'SPAN') {
-
-        for (li in this.childNodes) {
-          if (this.childNodes[li].tagName == 'LI') {
-            //console.log(this.childNodes[li]);
-            this.childNodes[li].style.backgroundColor = "#3b5bb4";
+        /**
+        * Find Module - Search for a module in rawModules by it's name. [v0.1]
+        *
+        * @param {String} name - Name of module, i.e. [alert, weatherforecast, updatenotification]
+        * @returns {Object} module - A module as an object from the config.js.
+        * @child {Function} findModulePosition() - Derivative of this function.
+        */
+        function findModule(name) {
+          for (mod in rawModules) {
+            if (rawModules[mod].module == name) {
+              return rawModules[mod];
+            }
           }
         }
-        e.target.parentNode.style.backgroundColor = "#ec4174";
-        var targetName = arrayModules[e.target.parentNode.id];
 
-        ///Hashing!
-        var href = window.location.href;
-        if(href.indexOf("#") > 0){
-            href = href.split("#")[0] + "?var=1#" + href.split("#")[1];
-            window.location.hash = '';
+        /**
+        * Find Module Position - Search for a module in rawModules and get its rawModules {Array} position. [v0.1]
+        *
+        * @param {String} name - Name of module, i.e. [alert, weatherforecast, updatenotification]
+        * @returns {Integer} int - Integer that references the module when doing rawModules[int];
+        * @parent {Function} findModule() - Anti-Derivative of this function.
+        */
+        function findModulePosition(name) {
+          var int = -1;
+
+          for (mod in rawModules) {
+            int += 1;
+            if (rawModules[mod].module == name) {
+              return int;
+            }
+          }
         }
-        location.hash = ("#" + targetName);
 
-        $("li[id=configItem]").remove();
-        setTimeout(function () { populateConfigCard(findModule(targetName));  document.getElementById("secondTab").click();}, 20);
-      }
-  });
-}
+        /**
+        * Snack Bar - Presents a MDL snackBar message for a few seconds. [v0.1]
+        *
+        * @param {String} msg - The message being displayed.
+        * @param {Integer} tab - The tab number that you want it to be overlayed on.
+        * @dependency {JavaScript} mdl - The Material Design Lite package by Google.
+        */
+        function snackBar(msg, tab) {
+          var snackbarContainer = document.querySelector('#tab-' + tab);
+          var data = {message: msg};
+          snackbarContainer.MaterialSnackbar.showSnackbar(data);
+        }
+
+        /**
+        * Trigger Handicap - Easy function to "handicap" element(s). [v0.1]
+        *
+        * @param {[Object]} parts - Array of Objects that will be affected.
+          * @example triggerHandicap(elementID: "disable | enable | show | hide", ...);
+        */
+        function triggerHandicap(parts) {
+          var partKeys = Object.keys(parts);
+
+          for (part in partKeys) {
+            var partElement = document.getElementById(partKeys[part]);
+
+            switch (parts[partKeys[part]]) {
+              case "disable":
+                partElement.disabled = true;
+              break;
+
+              case "enable":
+                partElement.disabled = false;
+              break;
+
+              case "show":
+                partElement.style.display = "initial";
+              break;
+
+              case "hide":
+                partElement.style.display = "none";
+              break;
+
+              default:
+              console.error("triggerHandicap() was called with key, " + parts[partKeys[part]] + " but the key's value which was passed didn't satisfy any elements. Try, [disable | enable | show | hide]");
+            }
+          }
+        }
+
+
+        /**
+        * Positions Not Taken - Loop through all rawModules positions and take them away from all possible positions; and then return the one's left. [v0.1]
+        *
+        * @returns {Array} allPositions - Returns all possible module positions minus the one's taken.
+        */
+        function positionsNotTaken() {
+          var allPositions = ["top_bar", "bottom_bar", "top_left", "bottom_left", "top_right", "bottom_right", "top_center", "bottom_center", "upper_third", "middle_center", "lower_center"];
+
+          for (pos in mapModulePositions) {
+            for (var i=allPositions.length-1; i>=0; i--) {
+              if (allPositions[i] === mapModulePositions[pos]) {
+                allPositions.splice(i, 1);
+              }
+            }
+          }
+          return allPositions;
+        }
+
+
+        function sendOutData(data) {
+            var socket = io('http://192.168.1.130:1984', {transports: ['websocket', 'polling', 'flashsocket']});
+            socket.emit('configUpdate', data);
+        }
+    /**
+    * End of, Utility Functions
+    */
 
 
 
-function populateConfigCard(mod) {
-  var ul = document.getElementById("configList");
-  updateStatic = false;
-  currentModule = mod;
 
-  if (mod.config) {
-    triggerHandicap({enableButton: "enable", updateButton: "disable", positionButton: "enable"});
-    populatePositionDropdown();
-    var configObjectMap = {};
-    for (cfg in mod.config) {
-      var li = document.createElement("li");
-        li.className = "mdl-list__item lit";
-        li.id = "configItem";
-        var spanPrimary = document.createElement("span");
-          spanPrimary.className = "mdl-list__item-primary-content";
-          spanPrimary.innerHTML = cfg + ":  ";
-          spanPrimary.style.padding = "10px";
-          var spanSecondary = document.createElement("span");
-          spanSecondary.className = "mdl-list__item-secondary-action";
-          spanSecondary.id = cfg;
-          if (mod.config[cfg] != "[object Object]") {
-            var div = document.createElement("div");
-            div.className = "mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-upgraded";
-            var input = document.createElement("input");
+    /**
+    * Tab #1 || Modules-Tab Functions
+    *
+    * @function {Object} [v0.1] appendModules() - Add/Append all modules that are taken from the config.js.
+    */
+
+        /**
+        * Append Modules - Add/Append all modules that are taken from the config.js file. [v0.1]
+        */
+        function appendModules() {
+          var ul = document.getElementById("sortable1");
+          var buttonWidthSync = "180px";
+          var arryNumber = -1;
+
+          // NOTE: Go through all rawModules and add them to the module list.
+          for (mod in rawModules) {
+            var li = document.createElement("li");
+            var btn = document.createElement("button");
+            li.appendChild(btn);
+            li.className = "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored";
+            li.innerHTML = rawModules[mod].module;
+            li.style = "cursor:pointer";
+            li.style.fontSize = "15px";
+            li.style.width = buttonWidthSync;
+            li.style.textAlign = "center";
+            arrayModules.push(rawModules[mod].module);
+            arryNumber = arryNumber + 1;
+            li.id = arryNumber;
+
+            li.addEventListener('click', function(e) {
+              console.error(this);
+              for (li in this.parentNode) {
+                if (this.parentNode[li].tagName == 'LI') {
+                  // NOTE: Reset all module's color to (unselected) blue.
+                  this.parentNode[li].style.backgroundColor = "#3b5bb4";
+                }
+              }
+              // NOTE: Set selected module to pink.
+              this.style.backgroundColor = "#ec4174";
+              var targetName = arrayModules[this.id];
+
+              // NOTE: Set URL hash to module's name i.e. (localhost:1984/#calendar)
+              var href = window.location.href;
+              if (href.indexOf("#") > 0) {
+                href = href.split("#")[0] + "?var=1#" + href.split("#")[1];
+                window.location.hash = '';
+              }
+              location.hash = ("#" + targetName);
+
+              // NOTE: Clear all previous config items in Config-Tab, using jQuery.
+              $("li[id=configItem]").remove();
+
+              // NOTE: After 20ms populateConfigCard() and click on the Config-Tab.
+              setTimeout(function () { populateConfigCard(findModule(targetName));
+              document.getElementById("secondTab").click();}, 20);
+            });
+
+            ul.appendChild(li);
+          }
+        }
+
+        function handleDialogue() {
+          var dialog = document.querySelector('dialog');
+          var addModuleButton = document.querySelector('#add-module');
+          if (! dialog.showModal) {
+            dialogPolyfill.registerDialog(dialog);
+          }
+          addModuleButton.addEventListener('click', function() {
+            dialog.showModal();
+          });
+          dialog.querySelector('.close').addEventListener('click', function() {
+            dialog.close();
+          });
+        }
+
+
+    /**
+    * End of, Modules-Tab Functions
+    */
+
+
+
+
+    /**
+    * Tab #2 || Config-Tab Functions
+    *
+    * @function {Void} [v0.1] populateConfigCard() - Populate the Config-Tab (Tab-3) with a module's pre-made config.
+    * @function {Void} [v0.1] populatePositionDropdown() - Populate the dropdown menu on the Config-Tab which lists possible positions for the module.
+    * @function {Object} [v0.1] updateConfig() - Push fullDynamicConfig Object which containts a constatly updating version of the config.js file.
+    * @function {Void} [v0.1] clearConfig() - Clear all inputs fromt the Config-Tab Card.
+    * @function {Void} [v0.1] updateConfigUI() - Clear all config inputs and then re-populate Config-Tab Card with hashName.
+    * @function {Void} [v0.1] updateConfigPositions() -
+    * @dependency {JavaScript} [v0.1] mdl - The Material Design Lite package by Google.
+    */
+
+        /**
+        * Populate Config Card - Populate the Config-Tab Card with a module's pre-made config. [v0.1]
+        *
+        * @param {Object} mod - The message being displayed.
+        * @exception {Error} notConfigurable - The module that was passed didn't have a position or config to change.
+        * @exception {Error} positionConfigurable - The module that was passed has a position but no config.
+        * @dependency {JavaScript} mdl - The Material Design Lite package by Google.
+        */
+        function populateConfigCard(mod) {
+          var ul = document.getElementById("configList");
+          updateStatic = false;
+          currentModule = mod;
+
+          if (mod.config) {
+            triggerHandicap({enableButton: "enable", updateButton: "disable", positionButton: "enable"});
+            populatePositionDropdown();
+            var configObjectMap = {};
+            for (cfg in mod.config) {
+              var li = document.createElement("li");
+              li.className = "mdl-list__item lit";
+              li.id = "configItem";
+              var spanPrimary = document.createElement("span");
+              spanPrimary.className = "mdl-list__item-primary-content";
+              spanPrimary.innerHTML = cfg + ":  ";
+              spanPrimary.style.padding = "10px";
+              var spanSecondary = document.createElement("span");
+              spanSecondary.className = "mdl-list__item-secondary-action";
+              spanSecondary.id = cfg;
+              if (mod.config[cfg] != "[object Object]") {
+                var div = document.createElement("div");
+                div.className = "mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-upgraded";
+                var input = document.createElement("input");
                 input.className = "mdl-textfield__input";
                 input.type = "text"
                 input.id = cfg;
                 li.onkeyup = function() {
-                    updateToggle(this);
+                  updateToggle(this);
                 }
-              var label = document.createElement("label");
+                var label = document.createElement("label");
                 label.className = "mdl-textfield__label";
                 label.htmlFor = cfg
                 label.textContent = mod.config[cfg];
                 div.appendChild(input);
                 div.appendChild(label);
                 spanSecondary.appendChild(div);
-          }
-          else {
-            configObjectMap[cfg] = mod.config[cfg][0];
-            var button = document.createElement("button");
-              button.id = "dropdown" + cfg;
-              button.className = "mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon";
-              var i = document.createElement("i");
+              } else {
+                configObjectMap[cfg] = mod.config[cfg][0];
+                var button = document.createElement("button");
+                button.id = "dropdown" + cfg;
+                button.className = "mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon";
+                var i = document.createElement("i");
                 i.className = "material-icons";
                 i.innerHTML = "arrow_drop_down";
-              button.appendChild(i);
-              spanSecondary.appendChild(button);
-              button.onclick = function() {
-                    extendConfigItem(this.parentNode.parentNode, configObjectMap[this.parentNode.id]);
-                  }
-            }
-
-            triggerHandicap({enableButton: "enable", updateButton: "disable", positionButton: "enable"});
-            setTimeout(function () { componentHandler.upgradeDom('MaterialTextfield', 'mdl-textfield'); }, 10);
-            li.appendChild(spanPrimary);
-            li.appendChild(spanSecondary);
-            ul.appendChild(li);
-      }
-    } else {
-      if (mod.position == null) {
-          if (mod.config == null) {
-            triggerHandicap({updateButton: "disable", positionButton: "disable"});
-            snackBar(mod.module + ", module isn't configurable.");
-          }
-        }
-      else if (mod.position != null) {
-        if (mod.config == null) {
-            populatePositionDropdown();
-            triggerHandicap({updateButton: "disable", positionButton: "enable", enableButton: "enable"});
-            snackBar(mod.module + ", does not have a config, but position is avaiable.")
-        }
-      }
-    }
-}
-
-function updateToggle(element) {
-  var updateButton = document.getElementById("updateButton");
-
-  checkConfigCardInputs()
-
-  setTimeout(function () {
-    if (Object.keys(dynamicConfig).length > 0) {
-      updateButton.disabled = false;
-    } else {
-      updateButton.disabled = true;
-    }
-   }, 5);
-}
-
-function checkConfigCardInputs() {
-  var configCard = document.getElementById("configList");
-  var newModuleConfig = {};
-
-    if (configCard.childNodes.length > 1) {
-      for (li in configCard.childNodes) {
-          if (configCard.childNodes[li].id == "configItem") {
-            var input = configCard.childNodes[li].childNodes[1].childNodes[0].childNodes[0].value;
-            if (input != "") {
-              newModuleConfig[configCard.childNodes[li].childNodes[1].id] = input;
-            } else {
-              delete newModuleConfig[configCard.childNodes[li].childNodes[1].id];
-            }
-          }
-      }
-    }
-  dynamicConfig = newModuleConfig;
-}
-
-
-function extendConfigItem(configItem, items) {
-  var ul = document.createElement("ul");
-  ul.className = "demo-list-control mdl-list";
-  for (cfg in items) {
-      var li = document.createElement("li");
-      li.className = "mdl-list__item";
-      li.id = cfg;
-      li.style.padding = "0px 0px 0px 20px";
-      var spanPrimary = document.createElement("span");
-        spanPrimary.className = "mdl-list__item-primary-content";
-        spanPrimary.innerHTML = cfg + ":  ";
-        spanPrimary.style.padding = "10px";
-        var spanSecondary = document.createElement("span");
-        spanSecondary.className = "mdl-list__item-secondary-action";
-        spanSecondary.id = cfg;
-        if (items[cfg] != "[object Object]") {
-          var div = document.createElement("div");
-          div.className = "mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-upgraded";
-          var input = document.createElement("input");
-              input.className = "mdl-textfield__input";
-              input.type = "text";
-              input.id = cfg;
-              li.onkeyup = function() {
-                updateToggle(this);
-              }
-            var label = document.createElement("label");
-              label.className = "mdl-textfield__label";
-              label.htmlFor = cfg;
-              label.textContent = items[cfg];
-              div.appendChild(input);
-              div.appendChild(label);
-              spanSecondary.appendChild(div);
-        }
-        else {
-          configObjectMap[cfg] = items[cfg][0];
-          var button = document.createElement("button");
-            button.id = "dropdown" + cfg;
-            button.className = "mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon";
-            var i = document.createElement("i");
-              i.className = "material-icons";
-              i.innerHTML = "arrow_drop_down";
-            button.appendChild(i);
-            spanSecondary.appendChild(button);
-            button.onclick = function() {
+                button.appendChild(i);
+                spanSecondary.appendChild(button);
+                button.onclick = function() {
                   extendConfigItem(this.parentNode.parentNode, configObjectMap[this.parentNode.id]);
                 }
-          }
+              }
 
-          setTimeout(function () { componentHandler.upgradeDom('MaterialTextfield', 'mdl-textfield'); }, 10);
-          li.appendChild(spanPrimary);
-          li.appendChild(spanSecondary);
-          ul.appendChild(li);
-    }
-    console.info(configItem);
-    configItem.appendChild(ul);
-}
-
-function populatePositionDropdown() {
-  var ul = document.getElementById("positionList");
-  var validPositions = positionsNotTaken();
-
-  for (pos in validPositions) {
-      var li = document.createElement("li");
-      li.className = "mdl-menu__item";
-      li.innerHTML = validPositions[pos];
-      li.id = "positionItem";
-      ul.appendChild(li);
-  }
-
-  ul.addEventListener('click', function(e) {
-      if (e.target.tagName == 'LI'){
-        var icon = document.getElementById("positionButton");
-        icon.style.color = "#ec4174";
-        var updateButton = document.getElementById("updateButton");
-
-        for (li in e.target.parentNode.childNodes) {
-          if (e.target.parentNode.childNodes[li].tagName == 'LI') {
-            e.target.parentNode.childNodes[li].style.backgroundColor = "#FFFFFF"
+              triggerHandicap({enableButton: "enable", updateButton: "disable", positionButton: "enable"});
+              setTimeout(function () { componentHandler.upgradeDom('MaterialTextfield', 'mdl-textfield'); }, 10);
+              li.appendChild(spanPrimary);
+              li.appendChild(spanSecondary);
+              ul.appendChild(li);
+            }
+          } else {
+            if (mod.position == null) {
+              if (mod.config == null) {
+                triggerHandicap({updateButton: "disable", positionButton: "disable"});
+                console.log("Module selected is not configurable.");
+                snackBar((mod.module + ", module isn't configurable."), 2);
+              }
+            }
+            else if (mod.position != null) {
+              if (mod.config == null) {
+                populatePositionDropdown();
+                triggerHandicap({updateButton: "disable", positionButton: "enable", enableButton: "enable"});
+                console.error(mod.module + ", does not have a config, but position is avaiable.");
+                snackBar((mod.module + ", does not have a config, but position is avaiable."), 2);
+              }
+            }
           }
         }
-        if (e.target.id == updatedPosition) {
-          delete dynamicConfig.position;
-          if (Object.keys(dynamicConfig).length == 0) {
-            updateButton.disabled = true;
+
+        /**
+        * Extend Config Card - Populate the Derivative Config-Tab Card with a module's child config. [v0.1]
+        *
+        * @param {Object} configItem - The configItem that we will be taking the Derivative of.
+        * @param {Array} items - The items that will be placed underneath the configItem as their children inputs.
+        * @dependency {JavaScript} mdl - The Material Design Lite package by Google.
+        */
+        function extendConfigItem(configItem, items) {
+          var ul = document.createElement("ul");
+          ul.className = "demo-list-control mdl-list";
+          for (cfg in items) {
+              var li = document.createElement("li");
+              li.className = "mdl-list__item";
+              li.id = cfg;
+              li.style.padding = "0px 0px 0px 20px";
+              var spanPrimary = document.createElement("span");
+                spanPrimary.className = "mdl-list__item-primary-content";
+                spanPrimary.innerHTML = cfg + ":  ";
+                spanPrimary.style.padding = "10px";
+                var spanSecondary = document.createElement("span");
+                spanSecondary.className = "mdl-list__item-secondary-action";
+                spanSecondary.id = cfg;
+                if (items[cfg] != "[object Object]") {
+                  var div = document.createElement("div");
+                  div.className = "mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-upgraded";
+                  var input = document.createElement("input");
+                      input.className = "mdl-textfield__input";
+                      input.type = "text";
+                      input.id = cfg;
+                      li.onkeyup = function() {
+                        updateToggle(this);
+                      }
+                    var label = document.createElement("label");
+                      label.className = "mdl-textfield__label";
+                      label.htmlFor = cfg;
+                      label.textContent = items[cfg];
+                      div.appendChild(input);
+                      div.appendChild(label);
+                      spanSecondary.appendChild(div);
+                }
+                else {
+                  configObjectMap[cfg] = items[cfg][0];
+                  var button = document.createElement("button");
+                    button.id = "dropdown" + cfg;
+                    button.className = "mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon";
+                    var i = document.createElement("i");
+                      i.className = "material-icons";
+                      i.innerHTML = "arrow_drop_down";
+                    button.appendChild(i);
+                    spanSecondary.appendChild(button);
+                    button.onclick = function() {
+                          extendConfigItem(this.parentNode.parentNode, configObjectMap[this.parentNode.id]);
+                        }
+                  }
+
+                  setTimeout(function () { componentHandler.upgradeDom('MaterialTextfield', 'mdl-textfield'); }, 10);
+                  li.appendChild(spanPrimary);
+                  li.appendChild(spanSecondary);
+                  ul.appendChild(li);
+            }
+            configItem.appendChild(ul);
+        }
+
+        /**
+        * Populate Positions Dropdown - Populate a dropdown menu in the Config-Tab which has only the available positions. [v0.1]
+        *
+        * @child {Function} positionsNotTaken() - Checks to see what positions are available for setting.
+        * @dependency {JavaScript} mdl - The Material Design Lite package by Google.
+        */
+        function populatePositionDropdown() {
+          var ul = document.getElementById("positionList");
+          var validPositions = positionsNotTaken();
+
+          for (pos in validPositions) {
+            var li = document.createElement("li");
+            li.className = "mdl-menu__item";
+            li.innerHTML = validPositions[pos];
+            li.id = "positionItem";
+            ul.appendChild(li);
           }
-          updatedPosition = null;
-          e.target.style.backgroundColor = "#FFFFFF";
+
+          ul.addEventListener('click', function(e) {
+            if (e.target.tagName == 'LI'){
+              var icon = document.getElementById("positionButton");
+              icon.style.color = "#ec4174";
+              var updateButton = document.getElementById("updateButton");
+
+              for (li in e.target.parentNode.childNodes) {
+                if (e.target.parentNode.childNodes[li].tagName == 'LI') {
+                  e.target.parentNode.childNodes[li].style.backgroundColor = "#FFFFFF"
+                }
+              }
+              if (e.target.id == updatedPosition) {
+                delete dynamicConfig.position;
+                if (Object.keys(dynamicConfig).length == 0) {
+                  updateButton.disabled = true;
+                }
+                updatedPosition = null;
+                e.target.style.backgroundColor = "#FFFFFF";
+                icon.style.color = "#FFFFFF";
+              } else {
+                updateButton.disabled = false;
+                updatedPosition = e.target.id;
+                e.target.style.backgroundColor = "#ec4174";
+                dynamicConfig.position = e.target.id;
+              }
+            }
+          });
+        }
+
+        /**
+        * Update Config - Push fullDynamicConfig Object which contains a constantly updating version of the config.js file. [v0.1]
+        *
+        * @exception {Error} zeroChanges - Thrown when this function is called and their aren't any changes to make.
+        */
+        function updateConfig() {
+          if (Object.keys(dynamicConfig).length > 0) {
+            if (dynamicConfig.position != null) {
+              fullDynamicConfig.modules[findModulePosition(currentModule.module)].position = dynamicConfig.position;
+              delete dynamicConfig.position;
+            }
+            for (cfg in dynamicConfig) {
+              fullDynamicConfig.modules[findModulePosition(currentModule.module)].config[cfg] = dynamicConfig[cfg];
+            }
+            checkConfigCardInputs();
+            var data = ("var config = " + JSON.stringify(fullDynamicConfig, null, "\t") + ";" + "\n if (typeof module !== 'undefined') {module.exports = config;}");
+            setTimeout(function () { sendOutData(data, currentModule); updateConfigUI(); }, 5);
+          } else {
+            console.error("This was caused by updateConfig() func being called with no config changes being made, yet updateButton was enabled.") }
+        }
+
+        /**
+        * Clear Config - Clear all inputs in the Config-Tab Card. [v0.1]
+        */
+        function clearConfig() {
+          var configCard = document.getElementById("configList");
+
+          if (configCard.childNodes.length > 1) {
+            for (li in configCard.childNodes) {
+              if (configCard.childNodes[li].id == "configItem") {
+                var input = configCard.childNodes[li].childNodes[1].childNodes[0].childNodes[0].value;
+                input = null;
+                triggerHandicap({updateButton: "disable"});
+              }
+            }
+          }
+        }
+
+        /**
+        * Update Config UI - Remove all configItems, positionItems and then re-populate with hashname Config-Tab. [v0.1]
+        */
+        function updateConfigUI() {
+          // NOTE: Grab current URL hashName.
+          var hashName = window.location.hash.substr(1, window.location.hash.lastIndexOf(''));
+
+          // NOTE: Remove all configItems and positionItems.
+          $("li[id=configItem]").remove();
+          $("li[id=positionItem]").remove();
+
+          // NOTE: Reset all UI to unselected state.
+          var icon = document.getElementById("positionButton");
           icon.style.color = "#FFFFFF";
-        } else {
-          updateButton.disabled = false;
-          updatedPosition = e.target.id;
-          e.target.style.backgroundColor = "#ec4174";
-          dynamicConfig.position = e.target.id;
-        }
-      }
-  });
-  //console.log(dynamicConfig);
-}
 
-  function findModule(name) {
-    for (mod in rawModules) {
-      if (rawModules[mod].module == name) {
-          return rawModules[mod];
-        }
-      }
-    }
+          // NOTE: Re-populate Config-Tab with current hashName's module.
+          populateConfigCard(findModule(hashName));
 
-    function findModulePosition(name) {
-      var int = -1;
-      for (mod in rawModules) {
-        int += 1;
-        if (rawModules[mod].module == name) {
-            return int;
+          // NOTE: Present a snackBar on Positions-Tab (Tab-2).
+          snackBar((hashName + ", module has been updated."), 2);
+        }
+
+        /** OPTIMIZE FOR VERSATILTIY
+        * Update Toggle - Enable or Disable a button depending on if their are changes or not. [v0.1]
+        *
+        * @param {String} element - The element that will be affected.
+        * @child {Function} checkConfigCardInputs() - Child function essential for updateToggle().
+        */
+        function buttonToggle(element) {
+          var updateButton = document.getElementById("updateButton");
+
+          // NOTE: Child function responsible for the checks.
+          checkConfigCardInputs();
+
+          // NOTE: Setting usablity depending on changes >= 0.
+          setTimeout(function () {
+            if (Object.keys(dynamicConfig).length > 0) {
+              updateButton.disabled = false;
+            } else {
+              updateButton.disabled = true;
+            }
+          }, 5);
+        }
+
+        /** OPTIMIZE FOR VERSATILTIY
+        * Check Config Card Inputs - Check each input in Config-Tab and record the input's live and also delete entries with input's that are now null. [v0.1]
+        *
+        * @parent {Function} updateToggle() - Used constantly in order to toggle the updateButton in the Config-Tab, (Tab-2).
+        */
+        function checkConfigCardInputs() {
+          var configCard = document.getElementById("configList");
+          var newModuleConfig = {};
+
+          // NOTE: Check if their is any inputs.
+          if (configCard.childNodes.length > 1) {
+            // NOTE: Loop through all inputs.
+            for (li in configCard.childNodes) {
+              if (configCard.childNodes[li].id == "configItem") {
+                // NOTE: Filter null inputs and update newModuleConfig for later dynamicConfig accessing.
+                var input = configCard.childNodes[li].childNodes[1].childNodes[0].childNodes[0].value;
+                if (input != "") {
+                  newModuleConfig[configCard.childNodes[li].childNodes[1].id] = input;
+                } else {
+                  delete newModuleConfig[configCard.childNodes[li].childNodes[1].id];
+                }
+              }
+            }
+          }
+          dynamicConfig = newModuleConfig;
+        }
+
+    /**
+    * End of, Config-Tab Functions
+    */
+
+
+
+    /**
+    * Tab #3 || Positions-Tab Functions
+    *
+    * @function {Void} [v0.1] setupPositionTab() - Populate and set up the Positions-Tab with all positions.
+    * @function {Void} [v0.1] updateConfigPositions() - Loops through all takenPositionsDynamic and sets them to their respectiv emodule in the fullDynamicConfig for publishing.
+    */
+
+        /**
+        * Setup Position Tab - Populate and set up the Positions-Tab with all positions. [v0.1]
+        *
+        * @dependency {JavaScript} mdl - The Material Design Lite package by Google.
+        */
+        function setupPositionTab() {
+          var allPositions = ["top_bar", "bottom_bar", "top_left", "bottom_left", "top_right", "bottom_right", "top_center", "bottom_center", "upper_third", "middle_center", "lower_center"];
+
+          // NOTE: For each position in allPositions do, the following.
+          for (pos in allPositions) {
+            var positionCell = document.getElementById("pos-" + allPositions[pos]);
+            var optionsList = document.createElement("ul");
+
+            // NOTE: If position cell is taken by a module on-load
+            if (mapModulePositionsReverse[allPositions[pos]]) {
+              var takenModuleName = document.createElement("p");
+
+              positionCell.style.backgroundColor = "#ec4174";
+              takenModuleName.style.lineHeight = "10px";
+              takenModuleName.style.marginBottom = "-10px";
+              takenModuleName.innerHTML = mapModulePositionsReverse[allPositions[pos]];
+              positionCell.appendChild(takenModuleName);
+            }
+
+            // NOTE: If not, we will still put in takenModuleName but will just be a placeholder. ^^
+            else {
+              var takenModuleName = document.createElement("p");
+
+              takenModuleName.style.lineHeight = "10px";
+              takenModuleName.style.marginBottom = "-10px";
+              takenModuleName.innerHTML = "";
+              positionCell.appendChild(takenModuleName);
+            }
+
+            positionCell.onclick = function () {
+              if (selectedPosition != null) {
+                var selectedPositionCell = document.getElementById(selectedPosition);
+                var swapModuleName = this.childNodes[1].innerHTML;
+                var pinkColor = "#ec4174";
+                var blueColor = "#3b5bb4";
+
+                selectedPositionCell.style.filter = "brightness(100%)";
+                selectedPosition = null;
+
+                // NOTE: The secondly clicked cell was pink.
+                if (this.style.backgroundColor == "rgb(236, 65, 116)") {
+                  // NOTE: The initially clicked cell was pink & the secondly clicked.
+                  if (selectedPositionCell.style.backgroundColor == "rgb(236, 65, 116)") {
+                    this.childNodes[1].innerHTML = selectedPositionCell.childNodes[1].innerHTML;
+                    selectedPositionCell.childNodes[1].innerHTML = swapModuleName;
+                    takenPositionsDynamic[this.childNodes[1].innerHTML] = this.id.substr(4);
+                    takenPositionsDynamic[selectedPositionCell.childNodes[1].innerHTML] = selectedPositionCell.id.substr(4);
+                  }
+                  // NOTE: The initially clicked cell wasn't pink, but the second was.
+                  else {
+                    this.childNodes[1].innerHTML = selectedPositionCell.childNodes[1].innerHTML;
+                    selectedPositionCell.childNodes[1].innerHTML = swapModuleName;
+                    selectedPositionCell.style.backgroundColor = pinkColor;
+                    this.style.backgroundColor = blueColor;
+                    takenPositionsDynamic[selectedPositionCell.childNodes[1].innerHTML] = selectedPositionCell.id.substr(4);
+                  }
+                }
+                else {
+                  // NOTE: The secondly clicked cell wasn't pink, but the initial was.
+                  if (selectedPositionCell.style.backgroundColor == "rgb(236, 65, 116)") {
+                    this.childNodes[1].innerHTML = selectedPositionCell.childNodes[1].innerHTML;
+                    selectedPositionCell.childNodes[1].innerHTML = swapModuleName;
+                    selectedPositionCell.style.backgroundColor = blueColor;
+                    this.style.backgroundColor = pinkColor;
+                    takenPositionsDynamic[this.childNodes[1].innerHTML] = this.id.substr(4);
+                  } else {
+                    // NOTE: Both selectedPositionCell's were Blue aka no point in commiting the swap.
+                    console.log("Client selected two position cells that are not set.");
+                  }
+                }
+
+              } else {
+                // NOTE: If cell is pink, put a pink shadow behind selected cell.
+                if (this.style.backgroundColor == "rgb(236, 65, 116)") {
+                  this.style.filter = "drop-shadow(9px 9px 9px rgba(224, 88, 122, 1)) brightness(105%)";
+                }
+                // NOTE: If cell is blue, put a blue shadow behind selected cell.
+                else {
+                  this.style.filter = "drop-shadow(9px 9px 9px rgba(58, 89, 176, 1)) brightness(105%)";
+                }
+                selectedPosition = this.id;
+              }
+            }
           }
         }
-      }
 
-  function parseModules() {
-    for (mod in rawModules) {
-      if (rawModules[mod].position != null) {
-        mapModulePositions[rawModules[mod].module] = rawModules[mod].position;
-        mapModulePositionsReverse[rawModules[mod].position] = rawModules[mod].module;
-      }
-    }
-  }
-
-  function positionsNotTaken() {
-    var allPositions = ["top_bar", "bottom_bar", "top_left", "bottom_left", "top_right", "bottom_right", "top_center", "bottom_center", "upper_third", "middle_center", "lower_center"];
-    var notTaken = [];
-    for (pos in mapModulePositions) {
-      for (var i=allPositions.length-1; i>=0; i--) {
-        if (allPositions[i] === mapModulePositions[pos]) {
-            allPositions.splice(i, 1);
+        /**
+        * Update Config Positions - Loops through all takenPositionsDynamic and sets them to their respective module in the fullDynamicConfig for publishing. [v0.1]
+        *
+        * @logging {Info} success - Logs that the client has pushed successfully, and also gives them a snackBar.
+        * @parent {Function} updateConfig() - Anti-Derivative of this function. Used for pushing Config-Tab updates.
+        */
+        function updateConfigPositions() {
+          // NOTE: Loop through all takenPositionsDynamic to update fullDynamicConfig's module's positions.
+          for (pos in takenPositionsDynamic) {
+            fullDynamicConfig.modules[findModulePosition(pos)].position = takenPositionsDynamic[pos];
           }
-        }
-      }
-      return allPositions;
-  }
+          // NOTE: Parse all the fullDynamicConfig with the changes.
+          var data = ("var config = " + JSON.stringify(fullDynamicConfig, null, "\t") + ";" + "\n if (typeof module !== 'undefined') {module.exports = config;}");
 
-    function snackBar(msg2) {
-        var snackbarContainer = document.querySelector('#demo-toast-example');
-        var data = {message: msg2};
-        snackbarContainer.MaterialSnackbar.showSnackbar(data);
-    }
+          // NOTE: Present a snackBar to Positions-Tab (Tab-3).
+          snackBar("Successfully pushed positions-config update.", 3);
+
+          // NOTE: Finally, push out the data, and log the push (Both on the client's console and server's.)
+          setTimeout(function () { sendOutData(data, currentModule);
+            console.log("Client has pushed a positions config change."); }, 5);
+        }
+
+
+    /**
+    * End of, Positions-Tab Functions
+    */
+
 
 appendModules();
+handleDialogue();
 parseModules();
 setupPositionTab();
 triggerHandicap({updateButton: "disable", positionButton: "disable"});

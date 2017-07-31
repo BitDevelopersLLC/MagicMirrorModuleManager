@@ -14,11 +14,11 @@ var config = {
 		},
 		{
 			"module": "updatenotification",
-			"position": "top_left"
+			"position": "lower_center"
 		},
 		{
 			"module": "clock",
-			"position": "top_left"
+			"position": "middle_center"
 		},
 		{
 			"module": "calendar",
@@ -46,10 +46,10 @@ var config = {
 		},
 		{
 			"module": "weatherforecast",
-			"position": "top_center",
+			"position": "bottom_right",
 			"header": "Weather Forecast",
 			"config": {
-				"units": "imperial",
+				"units": "Host",
 				"location": "Ladera Ranch",
 				"locationID": "5364199",
 				"appid": "0d8cbd2c42f528549ddb896767e82809"
@@ -57,7 +57,7 @@ var config = {
 		},
 		{
 			"module": "newsfeed",
-			"position": "bottom_right",
+			"position": "upper_third",
 			"config": {
 				"feeds": [
 					{
