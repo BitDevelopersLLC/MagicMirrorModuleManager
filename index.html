@@ -4,10 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MMMM</title>
-  <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet"> -->
   <link rel="stylesheet" href="./mdl/material.css">
   <script src="./mdl/material.min.js"></script>
+  <script src="jquery.js"></script>
+  <script src="./mdl/dialog-polyfill.js"></script>
+  <link rel="stylesheet" type="text/css" href="dialog-polyfill.css" />
 
   <style>
 
@@ -141,11 +142,59 @@
 
 
   </style>
-  <!-- <script src="https://code.jquery.com/jquery-1.12.4.js"></script> -->
-  <script src="jquery.js"></script>
+
+<dialog class="mdl-dialog">  
+      <h1 id="dialogTitle" class="mdl-dialog__title">Add Module</h1>
+      <div class="mdl-dialog__content">
+
+        <p id="dialogInstructions">
+          Paste the module's GitHub URL:
+        </p>
+
+        <!-- Simple Textfield -->
+        <form action="#" id="dialogTextFieldForm">
+          <div class="mdl-textfield mdl-js-textfield" id="dialogTextFieldDiv">
+            <input class="mdl-textfield__input" type="text" id="dialogTextField">
+            <label class="mdl-textfield__label" for="dialogTextField" id="dialogLabel">https://github.com/EliteByte/MMM-example</label>
+          </div>
+        </form>
+
+        <!-- Floating Multiline Textfield -->
+        <form action="#">
+          <div class="mdl-textfield mdl-js-textfield" id="dialogMultiLineDiv">
+            <textarea class="mdl-textfield__input" type="text" rows= "3" id="dialogMultiLine"></textarea>
+            <label class="mdl-textfield__label" for="dialogMultiLine" id="dialogMultiLineLabel">
+              { <br/>
+                &emsp; module: "clock", <br/>
+                &emsp; position: "top_left", <br/>
+                &emsp; config: { <br/>
+                  &emsp; &emsp; // The config property is optional. <br/>
+                  &emsp; &emsp; // See 'Configuration options' for more information. <br/>
+                &emsp; } <br/>
+              } <br/>
+            </label>
+          </div>
+        </form>
+
+      </div>
+
+    <div class="mdl-dialog__actions">
+      <button type="button" id="dialogNextButton" class="mdl-button" onclick="dialogNext()">Next</button>
+      <button type="button" id="dialogCancelButton" class="mdl-button close">Cancel</button>
+      <br> </br>
+      <div id="dialogProgress" class="mdl-progress mdl-js-progress"></div>
+    </div>
+
+</dialog>
+
+
+
+
+
 </head>
 
 <body>
+
   <!-- Simple header with fixed tabs. -->
   <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header
               mdl-layout--fixed-tabs">
@@ -176,28 +225,10 @@
               <h2 class="mdl-card__title-text" text-align="center">Modules</h2>
             </div>
             </ul>
-            <button id="add-module" type="button" class="mdl-button mdl-button--colored">Add Module</button>
-            <dialog class="mdl-dialog">
-              <h1 id="dialogTitle" class="mdl-dialog__title">Add New Module</h1>
-              <div class="mdl-dialog__content">
-                <p id="dialogInstructions">
-                  Paste the module's GitHub URL:
-                </p>
-                <!-- Simple Textfield -->
-                <form action="#">
-                  <div class="mdl-textfield mdl-js-textfield">
-                    <input class="mdl-textfield__input" type="text" id="dialogTextField">
-                    <label class="mdl-textfield__label" for="githubTextField" id="dialogLabel">https://github.com/MichMich/MagicMirror/tree/develop/modules/default/clock</label>
-                  </div>
-                </form>
 
-              </div>
-              <div class="mdl-dialog__actions">
-                <button type="button" id="dialogNextButton" class="mdl-button">Next</button>
-                <button type="button" class="mdl-button close">Cancel</button>
-                <div id="dialogProgress" class="mdl-progress mdl-js-progress"></div>
-              </div>
-            </dialog>
+            <button id="add-module" type="button" class="mdl-button mdl-button--colored">Add Module</button>
+
+            <button id="update-modules" type="button" class="mdl-button mdl-button--colored">Update Modules</button>
           </div>
         </div>
       </section>
@@ -243,8 +274,11 @@
                 <ul id="positionList" class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
                   for="positionButton">
                 </ul>
-
                 <!-- End Position Button -->
+
+                
+                
+
           </div>
 
           <div id="tab-2" class="mdl-js-snackbar mdl-snackbar">
@@ -350,6 +384,12 @@ if (screen.width >= 699) {
 
   var selectedPosition = null;
   var takenPositionsDynamic = mapModulePositions;
+
+  var dialogInfo = { page: 1 };
+
+  // IMPORTANT: YOU NEED TO MAKE THIS NON-HARD CODED
+  var socketURL = "192.168.1.130:1984";
+  var socket = io(socketURL, {transports: ['websocket', 'polling', 'flashsocket']});
 
     /**
     * Pre-Initialization Functions
@@ -527,9 +567,58 @@ if (screen.width >= 699) {
 
 
         function sendOutData(data) {
-            var socket = io('http://192.168.1.130:1984', {transports: ['websocket', 'polling', 'flashsocket']});
+          try {
             socket.emit('configUpdate', data);
+            return true;
+          } catch (err) {
+            console.error("Error emiting data through socket. -> [ " + err + " ]");
+            return false;
+          }
         }
+
+        function sendOutGitHubRequest(requestType, repoURL) {
+        
+          switch (requestType) {
+            case "clone":
+              socket.emit('clone', { type: 'clone', repo: repoURL });
+
+              if (isGitBusy()) {
+                console.error("GitHub just returned with an error when making a request. \n Please check the server's console for more informaiton.");
+                  return true;
+              } else {
+                console.log("GitHub is no longer busy");
+                return console.log("GitHub is no longer busy");
+              }
+              break;
+            case "pull":
+              socket.emit('pull', { type: 'pull', repo: repoURL });
+              break;
+            default:
+              console.error("[Error] Function, sendOutGitHubRequest() failed. \n Caused by an unknown requestType -> " + requestType);
+          }
+          return true;
+        }
+
+        function isGitBusy() {
+          socket.emit('gitBusy', function () {  
+            socket.on('gitBusyReponse', function (response) {
+              if (response == true) {
+                // NOTE: GitHub Request Finished
+                return false;
+              } else if (reponse == false) {
+                // NOTE GitHub Request Still Unfinished
+                setTimeout(function () {
+                  isGitBusy();
+                }, 150);
+              } else {
+                return true;
+                // Note GitHub Request Failed with error = response
+                console.error("Function sendOutGitHubRequest(clone) failed with error \n" + response);
+              }
+            });
+          });
+        }
+
     /**
     * End of, Utility Functions
     */
@@ -567,11 +656,10 @@ if (screen.width >= 699) {
             li.id = arryNumber;
 
             li.addEventListener('click', function(e) {
-              console.error(this);
-              for (li in this.parentNode) {
-                if (this.parentNode[li].tagName == 'LI') {
+              for (li in this.parentNode.childNodes) {
+                if (this.parentNode.childNodes[li].tagName == 'LI') {
                   // NOTE: Reset all module's color to (unselected) blue.
-                  this.parentNode[li].style.backgroundColor = "#3b5bb4";
+                  this.parentNode.childNodes[li].style.backgroundColor = "#3b5bb4";
                 }
               }
               // NOTE: Set selected module to pink.
@@ -601,15 +689,126 @@ if (screen.width >= 699) {
         function handleDialogue() {
           var dialog = document.querySelector('dialog');
           var addModuleButton = document.querySelector('#add-module');
+
+          var dialogTextFieldDiv = document.getElementById("dialogTextFieldDiv");
+          var dialogMultiLineLabel = document.getElementById("dialogMultiLineLabel");
+          var dialogMultiLine = document.getElementById("dialogMultiLine");
+          var dialogMultiLineDiv = document.getElementById("dialogMultiLineDiv");
+
+
+          triggerHandicap({dialogMultiLine: "hide", dialogMultiLineLabel: "hide"});
+
           if (! dialog.showModal) {
             dialogPolyfill.registerDialog(dialog);
           }
           addModuleButton.addEventListener('click', function() {
             dialog.showModal();
           });
+
           dialog.querySelector('.close').addEventListener('click', function() {
+            dialogPage = 0;
+            dialogProgress.MaterialProgress.setProgress(0);
             dialog.close();
           });
+
+          document.querySelector('#dialogProgress').addEventListener('mdl-componentupgraded', function() {
+            this.MaterialProgress.setProgress(0);
+          });
+
+          dialog.style.width = "60vw";
+          dialogTextFieldDiv.style.width = "100%";
+          dialogMultiLine.style.width = "100%";
+          dialogMultiLineDiv.style.width = "100%";
+          dialogMultiLine.style.height = "27vh";
+
+        }
+
+        function dialogNext() {
+
+          var dialogTextField = document.getElementById("dialogTextField");
+          var dialogTextFieldForm = document.getElementById("dialogTextFieldForm");
+          var dialogTitle = document.getElementById("dialogTitle");
+          var dialogNextButton = document.getElementById("dialogNextButton");
+          var dialogProgress = document.getElementById("dialogProgress");
+          var dialogInstructions = document.getElementById("dialogInstructions");
+          var dialogLabel = document.getElementById("dialogLabel");
+          var dialogMultiLine = document.getElementById("dialogMultiLine");
+          var dialogMultiLineLabel = document.getElementById("dialogMultiLineLabel");
+          var dialogNextButton = document.getElementById("dialogNextButton");
+
+
+          switch (dialogInfo.page) {
+            case 1:
+
+              // NOTE: Set back everthing to normal.
+              dialogNextButton.innerHTML = "Next";
+              dialogTitle.innerHTML = "Add Module";
+
+              if (dialogTextField.value != null) {
+
+                dialogInfo.url = dialogTextField.value;
+
+                dialogTextFieldForm.parentNode.removeChild(dialogTextFieldForm);
+                dialogInstructions.innerHTML = "Paste Module's Default Config:";
+                triggerHandicap({"dialogMultiLine": "show", "dialogMultiLineLabel": "show"});
+
+                dialogInfo.page = dialogInfo.page + 1;
+                dialogProgress.MaterialProgress.setProgress(dialogInfo.page * 33.33);
+              }
+            break;
+            case 2:
+              if (dialogMultiLine.value != null) {
+                dialogInfo.config = dialogMultiLine.value;
+
+                dialogMultiLine.parentNode.parentNode.removeChild(dialogMultiLine.parentNode);
+                dialogNextButton.innerHTML = "Finish";
+                dialogTitle.innerHTML = "Clone & Apply Module";
+                dialogInstructions.innerHTML = "Click to download module onto MagicMirror and apply config.";
+
+                dialogInfo.page = dialogInfo.page + 1;
+                dialogProgress.MaterialProgress.setProgress(dialogInfo.page * 33.33);
+              }
+            break;
+
+            case 3:
+              var configSentOut = false;
+
+              try {
+                configSentOut = sendOutData(parseConfigData(dialogInfo.config));
+              } catch (err) {
+                console.error("[Error] Data sent to config has failed. Parsed config may be invalid. Caught Error -> " + "[ " + err + " ]");
+                snackBar("Error sending out data to config. Double check your pasted config. ");
+                alert(err);
+              }
+
+              if (configSentOut) {
+                try {
+                  sendOutGitHubRequest('clone', dialogInfo.url);
+                  dialogInfo.page = dialogInfo.page + 1;
+                  dialogProgress.MaterialProgress.setProgress(dialogInfo.page * 33.33);
+                  location.reload();
+                } catch (error) {
+                  console.error("[Error] GitHub Clone Request to download module to Mirror has failed. Check your MagicMirror console. Caught Error -> " + err);
+                  snackBar("Error sending out GitHub Clone request to server. Check Pi's console. ");
+                  alert(error);
+                }
+              }
+            break;
+
+            default:
+            break;
+          }
+
+        }
+
+        function parseConfigData(text) {
+
+          console.log(text);
+          var cfg = eval('('+text+')' );
+            fullDynamicConfig.modules[fullDynamicConfig.modules.length] = cfg;
+
+          var data = ("var config = " + JSON.stringify(fullDynamicConfig, null, "\t") + ";" + "\n if (typeof module !== 'undefined') {module.exports = config;}");
+          return data;
         }
 
 

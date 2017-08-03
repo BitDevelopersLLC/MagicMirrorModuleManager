@@ -1,47 +1,42 @@
-var url = require('url')
-var fs = require('fs')
-var path = require('path')
+var url = require('url');
+var fs = require('fs');
+var rimraf = require('rimraf');
+var path = require('path');
+var qrcode = require('qrcode-terminal');
+var googl = require('goo.gl');
 
-//var localtunnel = require('localtunnel');
+// NOTE: GitHub Handling Dependencies
+var git = require("nodegit");
+var gitParse = require("git-url-parse");
+var gitVer = require('git-rev');
+var gitBusy = false;
 
+
+// NOTE: For communication between server and client.
 var app = require('http').createServer(handler, {ssl: 'true'})
 var io = require('socket.io')(app);
 
+// NOTE: For IP Address.
 var os = require('os');
 var ifaces = os.networkInterfaces();
 
+var currentdate = new Date();
+var datetime = "Time: "
+              + currentdate.getHours() + ":"
+              + currentdate.getMinutes() + ":"
+              + currentdate.getSeconds();
+
+
+// NOTE: User changeable variables
 var port = 1984;
+var modulesDirectory = "modules";
 
-// function LocalTunnel(port, subdomain) {
-//    var  tunnel = localtunnel(port, { subdomain: subdomain}, function (err, tunnel) {
-//         if (err) {
-//             console.error("localTunnelCode Failed with error: " + inspect(err))
-//         } else {
-//             console.info("localTunnelCode connected and exposed on : " + tunnel.url + ":" + tunnel._opt.port)
-//         }
-//     })
-//     tunnel.on('close', function () {
-// console.error("tunnel -> Tunnel Closed...Going to Restart")
-//         tunnel = localtunnel(port, { subdomain: subdomain }, function (err, tunnel) {
-//             if (err) {
-// console.error("localTunnelCode Restart Failed with error: " + err)
-//             } else {
-// console.warn("localTunnelCode Re-Connected and exposed on : " + tunnel.url + ":" + tunnel._opt.port)
-//             }
-//         })
-//     })
-//
-//     tunnel.on('error', function (err) {
-// console.error("tunnel Error -> " + err)
-//     })
-// }
-//
-//   LocalTunnel(port, 'magicmirror');
-
-  setTimeout(function () { app.listen(port); }, 1);
+// NOTE: Pre-Initialization Statements
+app.listen(port);
+googl.setKey('AIzaSyBW-vcSOh3izzGSgSxG-_YDOQ_bIyaRYg8');
 
 function handler (request, response) {
-  console.log('request ', request.url);
+  //console.log('request ', request.url);
 
   var filePath = '.' + request.url;
   if (filePath == './')
@@ -89,41 +84,127 @@ function handler (request, response) {
           });
 }
 
+function getIP() {
+  var ipAddress = null;
+
+  Object.keys(ifaces).forEach(function (ifname) {
+    var alias = 0;
+
+    ifaces[ifname].forEach(function (iface) {
+      if ('IPv4' !== iface.family || iface.internal !== false) {
+        // skip over internal (i.e. 127.0.0.1) and non-ipv4 addresses
+        return;
+      }
+
+      if (alias >= 1) {
+        // this single interface has multiple ipv4 addresses
+        console.log(ifname + ':' + alias, iface.address);
+        ipAddress = iface.address;
+      } else {
+        // this interface has only one ipv4 adress
+        //console.log(ifname, iface.address);
+        ipAddress = iface.address;    
+      }
+      ++alias;
+    });
+  });
+  return ipAddress;
+}
+
+
+function repoHandle(handleType, reposit) {
+  eval(fs.readFileSync('repos.js')+'');
+
+  var contentDynamic = repositories;
+  var content = "var repositories = ";
+
+  var parsedRepo = gitParse(String(reposit));
+  var parsedDirectory = (modulesDirectory + "/" + parsedRepo.name);
+
+  switch (handleType) {
+
+    case "pull":
+      rimraf(parsedDirectory, function () {
+        console.log("[Info] Module, " + parsedRepo.name + " has been removed for updating.");
+      });
+      cloneRepo(reposit, parsedDirectory);
+    break;
+
+    case "clone":
+      cloneRepo(reposit, parsedDirectory);
+      contentDynamic[parsedRepo.name] = reposit;
+      if (contentDynamic != null) {
+        content = (content + "\n" + JSON.stringify(contentDynamic, null, "\t"));  
+        
+      }
+      
+    break;
+
+    default:
+      console.error("[Error] Function repoHandle() was called with a invalid handleType = " + handleType);
+
+  }
+
+  fs.writeFile("repos.js", content, function(err) {
+    if (err) {
+      console.error(datetime + " [Error] Saving to Repos.js Failed - > ", err);
+    } else {
+      console.log(datetime + "[Info] Push to Repos.js Succeeded.");
+    }
+  });
+}
+
+  gitVer.short(function (str) {
+    console.log('short', str)
+    // => aefdd94 
+  });
+
+function cloneRepo(repoURL, repoName) {
+  git.Clone(repoURL, repoName).then(function(repository) {
+    console.log("[Info] Server successfully cloned the module, " + repoName + " GitHub Repository");
+  });
+}
+
+
 function writeFile(content) {
-  //var content = ("var config = " + JSON.stringify(config, null, "\t") + ";" + "\n if (typeof module !== 'undefined') {module.exports = config;}");
   fs.writeFile("test.js", content, function(err) {
     if(err) {
         return console.log(err);
     }
-
     console.log("The file was saved!");
   });
 }
 
-Object.keys(ifaces).forEach(function (ifname) {
-  var alias = 0;
 
-  ifaces[ifname].forEach(function (iface) {
-    if ('IPv4' !== iface.family || iface.internal !== false) {
-      // skip over internal (i.e. 127.0.0.1) and non-ipv4 addresses
-      return;
-    }
-
-    if (alias >= 1) {
-      // this single interface has multiple ipv4 addresses
-      console.log(ifname + ':' + alias, iface.address);
-    } else {
-      // this interface has only one ipv4 adress
-      console.log(ifname, iface.address);
-    }
-    ++alias;
-  });
-});
-
+// NOTE: Post-Initialization Statements.
+console.log("Type in the link to open Module Manager.\n" +
+  'http://' + getIP() + ':1984' + "\nOr scan the QR code to be redirected.");
+qrcode.generate('http://' + getIP() + ':1984', {small: true});
+console.log("P.S. iOS 11 Camera App now auto detects QR.");
 
 io.on('connection', function (socket) {
-  socket.on('configUpdate', function (data, module) {
+
+  socket.on('configUpdate', function (data) {
     console.log("A client has pushed an update to the Config.js file.");
     writeFile(data);
   });
+
+  socket.on('pull', function (data) {
+    console.log('A client has pushed a gitHubRepo "pull" request.');
+    repoHandle(data.type, data.repo);
+  });
+
+  socket.on('clone', function (data) {
+    console.log('A client has pushed a gitHubRepo "clone" request.');
+    repoHandle(data.type, data.repo);
+  });
+
+  socket.on('gitBusy', function () {
+      socket.emit('gitBusyResponse', gitBusy);
+  });
+
 });
+
+
+
+
