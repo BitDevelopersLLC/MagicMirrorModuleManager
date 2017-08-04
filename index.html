@@ -186,11 +186,6 @@
     </div>
 
 </dialog>
-
-
-
-
-
 </head>
 
 <body>
@@ -275,10 +270,6 @@
                   for="positionButton">
                 </ul>
                 <!-- End Position Button -->
-
-                
-                
-
           </div>
 
           <div id="tab-2" class="mdl-js-snackbar mdl-snackbar">
@@ -587,7 +578,7 @@ if (screen.width >= 699) {
                   return true;
               } else {
                 console.log("GitHub is no longer busy");
-                return console.log("GitHub is no longer busy");
+                return false;
               }
               break;
             case "pull":
@@ -602,18 +593,19 @@ if (screen.width >= 699) {
         function isGitBusy() {
           socket.emit('gitBusy', function () {  
             socket.on('gitBusyReponse', function (response) {
+              console.error("Response : " + response);
               if (response == true) {
-                // NOTE: GitHub Request Finished
-                return false;
-              } else if (reponse == false) {
                 // NOTE GitHub Request Still Unfinished
                 setTimeout(function () {
                   isGitBusy();
-                }, 150);
+                }, 200);
+              } else if (reponse == true) {
+                // NOTE: GitHub Request Finished
+                return false;
               } else {
                 return true;
                 // Note GitHub Request Failed with error = response
-                console.error("Function sendOutGitHubRequest(clone) failed with error \n" + response);
+                console.error("Function sendOutGitHubRequest(clone) failed with a server-side error ->  \n" + response);
               }
             });
           });
@@ -771,22 +763,21 @@ if (screen.width >= 699) {
             break;
 
             case 3:
-              var configSentOut = false;
+              //change this after dev work
+              var configSentOut = true;
 
-              try {
-                configSentOut = sendOutData(parseConfigData(dialogInfo.config));
-              } catch (err) {
-                console.error("[Error] Data sent to config has failed. Parsed config may be invalid. Caught Error -> " + "[ " + err + " ]");
-                snackBar("Error sending out data to config. Double check your pasted config. ");
-                alert(err);
-              }
+              // try {
+              //   configSentOut = sendOutData(parseConfigData(dialogInfo.config));
+              // } catch (err) {
+              //   console.error("[Error] Data sent to config has failed. Parsed config may be invalid. Caught Error -> " + "[ " + err + " ]");
+              //   snackBar("Error sending out data to config. Double check your pasted config. ");
+              //   alert(err);
+              // }
 
               if (configSentOut) {
                 try {
                   sendOutGitHubRequest('clone', dialogInfo.url);
-                  dialogInfo.page = dialogInfo.page + 1;
-                  dialogProgress.MaterialProgress.setProgress(dialogInfo.page * 33.33);
-                  location.reload();
+                  //location.reload();
                 } catch (error) {
                   console.error("[Error] GitHub Clone Request to download module to Mirror has failed. Check your MagicMirror console. Caught Error -> " + err);
                   snackBar("Error sending out GitHub Clone request to server. Check Pi's console. ");
@@ -802,10 +793,9 @@ if (screen.width >= 699) {
         }
 
         function parseConfigData(text) {
-
-          console.log(text);
           var cfg = eval('('+text+')' );
-            fullDynamicConfig.modules[fullDynamicConfig.modules.length] = cfg;
+
+          fullDynamicConfig.modules[fullDynamicConfig.modules.length] = cfg;
 
           var data = ("var config = " + JSON.stringify(fullDynamicConfig, null, "\t") + ";" + "\n if (typeof module !== 'undefined') {module.exports = config;}");
           return data;

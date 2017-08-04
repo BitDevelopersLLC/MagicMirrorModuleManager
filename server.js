@@ -8,8 +8,8 @@ var googl = require('goo.gl');
 // NOTE: GitHub Handling Dependencies
 var git = require("nodegit");
 var gitParse = require("git-url-parse");
-var gitVer = require('git-rev');
-var gitBusy = false;
+var gitCommits = require('git-commits');
+var gitBusy = true;
 
 
 // NOTE: For communication between server and client.
@@ -19,12 +19,6 @@ var io = require('socket.io')(app);
 // NOTE: For IP Address.
 var os = require('os');
 var ifaces = os.networkInterfaces();
-
-var currentdate = new Date();
-var datetime = "Time: "
-              + currentdate.getHours() + ":"
-              + currentdate.getMinutes() + ":"
-              + currentdate.getSeconds();
 
 
 // NOTE: User changeable variables
@@ -113,13 +107,25 @@ function getIP() {
 
 
 function repoHandle(handleType, reposit) {
-  eval(fs.readFileSync('repos.js')+'');
-
-  var contentDynamic = repositories;
   var content = "var repositories = ";
 
-  var parsedRepo = gitParse(String(reposit));
-  var parsedDirectory = (modulesDirectory + "/" + parsedRepo.name);
+  try {
+    eval(fs.readFileSync('repos.js')+'');
+  } catch (err) {
+    console.error("[Error] Failed to evaluate the file repos.js. \n   This only fails if repos.js is not a valid JavaScript syntax. \n   To make things work again, try setting var repositories = {}; in repos.js");
+    gitBusy = err;
+    content = "var repositories = {};";
+    writeFileRepo(content);
+    return;    
+  } 
+
+  var contentDynamic = repositories;
+
+
+  var parsedRepo = null;
+  var parsedDirectory = null;
+  var repoPath = null;
+  var repoHash = null;
 
   switch (handleType) {
 
@@ -128,45 +134,55 @@ function repoHandle(handleType, reposit) {
         console.log("[Info] Module, " + parsedRepo.name + " has been removed for updating.");
       });
       cloneRepo(reposit, parsedDirectory);
+      writeFileRepo(content);
     break;
 
     case "clone":
-      cloneRepo(reposit, parsedDirectory);
-      contentDynamic[parsedRepo.name] = reposit;
-      if (contentDynamic != null) {
-        content = (content + "\n" + JSON.stringify(contentDynamic, null, "\t"));  
-        
-      }
-      
+
+      parsedRepo = gitParse(String(reposit));
+      parsedDirectory = (modulesDirectory + "/" + parsedRepo.name);
+      repoPath = path.resolve(parsedDirectory + '/.git');
+
+
+      gitBusy = true;
+      gitCommits(repoPath, {
+        limit: 1
+      }).on('data', function(commit) {
+        repoHash = commit.hash;
+      }).on('error', function(err) {
+        console.error("[Error] Retrieval of module's hash failed, so we are unable to retrive the module. \nA module's hash is used for versioning.");
+        gitBusy = err;
+        throw err;
+      }).on('end', function() {
+        cloneRepo(reposit, parsedDirectory);
+        contentDynamic[parsedRepo.name] = { url: reposit, hash: repoHash };
+        if (contentDynamic != null) {
+          content += ("\n" + JSON.stringify(contentDynamic, null, "\t"));
+          writeFileRepo(content);
+        }
+      });
+      console.log("[GitBusy]  = " + gitBusy);
     break;
 
     default:
       console.error("[Error] Function repoHandle() was called with a invalid handleType = " + handleType);
 
   }
-
-  fs.writeFile("repos.js", content, function(err) {
-    if (err) {
-      console.error(datetime + " [Error] Saving to Repos.js Failed - > ", err);
-    } else {
-      console.log(datetime + "[Info] Push to Repos.js Succeeded.");
-    }
-  });
 }
 
-  gitVer.short(function (str) {
-    console.log('short', str)
-    // => aefdd94 
-  });
+repoHandle('clone', 'https://github.com/EliteByte/MagicMirrorConfigurator');
+
 
 function cloneRepo(repoURL, repoName) {
   git.Clone(repoURL, repoName).then(function(repository) {
     console.log("[Info] Server successfully cloned the module, " + repoName + " GitHub Repository");
+    gitBusy = false;
   });
 }
 
 
 function writeFile(content) {
+
   fs.writeFile("test.js", content, function(err) {
     if(err) {
         return console.log(err);
@@ -175,27 +191,38 @@ function writeFile(content) {
   });
 }
 
+function writeFileRepo(content) {
+
+    fs.writeFile("repos.js", content, function(err) {
+    if (err) {
+      console.error("[Error] Saving to repos.js Failed - > ", err);
+    } else {
+      console.log("[Info] Push to repos.js Succeeded.");
+    }
+  });
+}
+
 
 // NOTE: Post-Initialization Statements.
-console.log("Type in the link to open Module Manager.\n" +
-  'http://' + getIP() + ':1984' + "\nOr scan the QR code to be redirected.");
-qrcode.generate('http://' + getIP() + ':1984', {small: true});
-console.log("P.S. iOS 11 Camera App now auto detects QR.");
+// console.log("Type in the link to open Module Manager.\n" +
+//   'http://' + getIP() + ':1984' + "\nOr scan the QR code to be redirected.");
+// qrcode.generate('http://' + getIP() + ':1984', {small: true});
+// console.log("P.S. iOS 11 Camera App now auto detects QR.");
 
 io.on('connection', function (socket) {
 
   socket.on('configUpdate', function (data) {
-    console.log("A client has pushed an update to the Config.js file.");
+    console.log("[Info] [Start] A client has pushed an update to the Config.js file.");
     writeFile(data);
   });
 
   socket.on('pull', function (data) {
-    console.log('A client has pushed a gitHubRepo "pull" request.');
+    console.log('[Info] [Start] A client has pushed a gitHubRepo "pull" request.');
     repoHandle(data.type, data.repo);
   });
 
   socket.on('clone', function (data) {
-    console.log('A client has pushed a gitHubRepo "clone" request.');
+    console.log('[Info] [Start] A client has pushed a gitHubRepo "clone" request.');
     repoHandle(data.type, data.repo);
   });
 

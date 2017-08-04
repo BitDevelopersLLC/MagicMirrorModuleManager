@@ -1,6 +1,7 @@
 var repositories = 
 {
-	"MMM-awesome-alexa": "https://github.com/dolanmiu/MMM-awesome-alexa",
-	"MMM-bitcoin": "https://github.com/valmassoi/MMM-bitcoin",
-	"MMM-bergfex": "https://github.com/nebulx29/MMM-bergfex"
+	"MMM-bergfex": {
+		"url": "https://github.com/nebulx29/MMM-bergfex",
+		"hash": "c5b3a8acbfebb690c79f00fdfddd4220dc19ceb0"
+	}
 }

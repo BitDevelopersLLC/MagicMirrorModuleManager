@@ -83,48 +83,6 @@ var config = {
 		},
 		{
 			"module": "MMM-bergfex",
-			"position": "top_center",
-			"classes": "small dimmed",
-			"config": {
-				"updateInterval": 1800000,
-				"animationSpeed": 0,
-				"header": "bergfex.at Snow Report",
-				"skiareas": [
-					"Gerlos - Zillertal Arena",
-					"Hauser Kaibling / Schladming - Ski amade",
-					"Hochkar",
-					"Hochkönig / Maria Alm - Dienten - Mühlbach - Ski amade",
-					"Klippitztörl",
-					"Koralpe"
-				],
-				"shortenArea": 20,
-				"cssclassrow": "normal",
-				"cssclassheader": "bright"
-			}
-		},
-		{
-			"module": "MMM-bergfex",
-			"position": "top_right",
-			"classes": "small dimmed",
-			"config": {
-				"updateInterval": 1800000,
-				"animationSpeed": 0,
-				"header": "bergfex.at Snow Report",
-				"skiareas": [
-					"Gerlos - Zillertal Arena",
-					"Hauser Kaibling / Schladming - Ski amade",
-					"Hochkar",
-					"Hochkönig / Maria Alm - Dienten - Mühlbach - Ski amade",
-					"Klippitztörl",
-					"Koralpe"
-				],
-				"shortenArea": 20,
-				"cssclassrow": "normal",
-				"cssclassheader": "bright"
-			}
-		},
-		{
-			"module": "MMM-bergfex",
 			"position": "top_right",
 			"classes": "small dimmed",
 			"config": {
