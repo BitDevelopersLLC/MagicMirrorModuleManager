@@ -9,6 +9,7 @@ var googl = require('goo.gl');
 var git = require("nodegit");
 var gitParse = require("git-url-parse");
 var gitCommits = require('git-commits');
+var gitLSCommit = require('git-ls-remote');
 var gitBusy = true;
 
 
@@ -130,11 +131,32 @@ function repoHandle(handleType, reposit) {
   switch (handleType) {
 
     case "pull":
+
+      parsedDirectory = (modulesDirectory + "/" + reposit);
+      repoPath = path.resolve(parsedDirectory + '/.git');
+
       rimraf(parsedDirectory, function () {
-        console.log("[Info] Module, " + parsedRepo.name + " has been removed for updating.");
+        console.log("[Info] Module, " + reposit + " has been removed for updating.");
       });
-      cloneRepo(reposit, parsedDirectory);
-      writeFileRepo(content);
+
+      cloneRepo(repositories[reposit].url, parsedDirectory);
+
+      gitLSCommit.head(reposit, function(err, result) {
+        if (err) { 
+          console.error("[Error] Retrieval of module's hash failed, so we are unable to retrive the module. \nA module's hash is used for versioning.");
+          gitBusy = err;
+          throw err;
+        } else { 
+          repoHash = result;
+          contentDynamic[reposit].hash = repoHash;
+
+          if (contentDynamic) {
+            content += ("\n" + JSON.stringify(contentDynamic, null, "\t"));
+            writeFileRepo(content);
+          }
+        }
+      });
+
     break;
 
     case "clone":
@@ -143,25 +165,23 @@ function repoHandle(handleType, reposit) {
       parsedDirectory = (modulesDirectory + "/" + parsedRepo.name);
       repoPath = path.resolve(parsedDirectory + '/.git');
 
-
       gitBusy = true;
-      gitCommits(repoPath, {
-        limit: 1
-      }).on('data', function(commit) {
-        repoHash = commit.hash;
-      }).on('error', function(err) {
-        console.error("[Error] Retrieval of module's hash failed, so we are unable to retrive the module. \nA module's hash is used for versioning.");
-        gitBusy = err;
+      cloneRepo(reposit, parsedDirectory);
+
+      gitLSCommit.head(reposit, function(err, result) {
+        if (err) { 
+          console.error("[Error] Retrieval of module's hash failed, so we are unable to retrive the module. \nA module's hash is used for versioning.");
+          gitBusy = err;
         throw err;
-      }).on('end', function() {
-        cloneRepo(reposit, parsedDirectory);
-        contentDynamic[parsedRepo.name] = { url: reposit, hash: repoHash };
-        if (contentDynamic != null) {
-          content += ("\n" + JSON.stringify(contentDynamic, null, "\t"));
-          writeFileRepo(content);
+        } else { 
+          repoHash = result;
+          contentDynamic[parsedRepo.name] = { url: reposit, hash: repoHash };
+          if (contentDynamic != null) {
+            content += ("\n" + JSON.stringify(contentDynamic, null, "\t"));
+            writeFileRepo(content);
+          }
         }
       });
-      console.log("[GitBusy]  = " + gitBusy);
     break;
 
     default:
@@ -173,10 +193,12 @@ function repoHandle(handleType, reposit) {
 repoHandle('clone', 'https://github.com/EliteByte/MagicMirrorConfigurator');
 
 
+
 function cloneRepo(repoURL, repoName) {
   git.Clone(repoURL, repoName).then(function(repository) {
     console.log("[Info] Server successfully cloned the module, " + repoName + " GitHub Repository");
     gitBusy = false;
+    return;
   });
 }
 
