@@ -38,11 +38,16 @@ var evaled = false;
 app.listen(port);
 
 function handler (request, response) {
-  //console.log('request ', request.url);
+
 
   var filePath = '.' + request.url;
   if (filePath == './')
     filePath = './index.html';
+
+
+    if (request.url == "/MagicMirror/config/config.js") {
+      filePath = ("." + filePath);
+    }
 
     var extname = String(path.extname(filePath)).toLowerCase();
     var contentType = 'text/html';
@@ -80,6 +85,7 @@ function handler (request, response) {
               }
             }
             else {
+
               response.writeHead(200, { 'Content-Type': contentType });
               response.end(content, 'utf-8');
             }
