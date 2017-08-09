@@ -25,7 +25,7 @@ var ifaces = os.networkInterfaces();
 // NOTE: User changeable variables
 var port = 19840;
 var modulesDirectory = "modules";
-var configPath = "config/test.js";
+var configPath = "../MagicMirror/config/config.js";
 var reposPath = "config/repos.js"
 
 

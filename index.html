@@ -397,7 +397,7 @@ if (screen.width >= 699) {
   var dialogInfo = { page: 1 };
 
   // IMPORTANT: YOU NEED TO MAKE THIS NON-HARD CODED
-  var socketURL = "192.168.1.130:1984";
+  var socketURL = ("http://" + window.location.hostname + ":" + window.location.port);
   var socket = io(socketURL, {transports: ['websocket', 'polling', 'flashsocket']});
 
     /**
