@@ -35,7 +35,12 @@ var evaled = false;
 
 
 // NOTE: Pre-Initialization Statements
-app.listen(port);
+try {
+  app.listen(port);
+} catch {
+  errorMsg("Failed starting server because the port has been taken.");
+  return;
+}
 
 function handler (request, response) {
 
