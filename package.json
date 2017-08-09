@@ -1,11 +1,21 @@
 {
-  "name": "magicmirrorconfigurator",
+  "name": "MagicMirrorModuleManager",
   "version": "1.0.0",
   "description": "This web based software allows configurations via a GUI interface for the MagicMirror2 Software configurations and modules..",
   "main": "server.js",
   "dependencies": {
     "@material/grid-list": "^0.2.5",
-    "material-components-web": "^0.13.0"
+    "fs": "0.0.1-security",
+    "git-clone": "^0.1.0",
+    "git-last-commit": "^0.3.0",
+    "git-url-parse": "^7.0.0",
+    "http-server": "^0.10.0",
+    "material-components-web": "^0.13.0",
+    "path": "^0.12.7",
+    "qrcode-terminal": "^0.11.0",
+    "rimraf-promise": "^2.0.0",
+    "socket.io": "^2.0.3",
+    "url": "^0.11.0"
   },
   "devDependencies": {},
   "scripts": {
@@ -13,12 +23,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/EliteByte/MagicMirrorConfigurator.git"
+    "url": "git+https://github.com/EliteByte/MagicMirrorModuleManager.git"
   },
   "author": "Mario Figueroa",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/EliteByte/MagicMirrorConfigurator/issues"
+    "url": "https://github.com/EliteByte/MagicMirrorModuleManager/issues"
   },
-  "homepage": "https://github.com/EliteByte/MagicMirrorConfigurator#readme"
+  "homepage": "https://github.com/EliteByte/MagicMirrorModuleManager#readme"
 }

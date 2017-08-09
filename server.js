@@ -23,8 +23,10 @@ var ifaces = os.networkInterfaces();
 
 
 // NOTE: User changeable variables
-var port = 1984;
+var port = 198;
 var modulesDirectory = "modules";
+var configPath = "config/test.js";
+var reposPath = "config/repos.js"
 
 
 // NOTE: Server variables (Dynamic).
@@ -191,7 +193,7 @@ function finishCloneRepo(repoURL, repoPath, repoName) {
 
       if (contentDynamic != null) {
           content += ("\n" + JSON.stringify(contentDynamic, null, "\t"));
-          writeFile(content, "repos.js").then(function (writeResponse) {
+          writeFile(content, reposPath).then(function (writeResponse) {
             infoMsg("Server has written info about the, " + repoName + " module, to the repos.js file.");
             resolve(true);
           }, function (error) {
@@ -234,7 +236,7 @@ function configUpdate(data) {
   return new Promise(function (resolve, reject) { 
     var parsedResponse = "";
 
-    writeFile(data, "test.js").then(function (response) {
+    writeFile(data, configPath).then(function (response) {
       parsedResponse = ("Update has finished saving client data.");
       infoMsgAdv(parsedResponse, 'end');
       resolve(true);
@@ -259,7 +261,7 @@ function removeModule(moduleName) {
       if (evaled) {
         delete contentDynamic[moduleName];
         content += ("\n" + JSON.stringify(contentDynamic, null, "\t"));
-        writeFile(content, "repos.js").then(function (writeResponse) {
+        writeFile(content, reposPath).then(function (writeResponse) {
             infoMsg("Server has removed info about the, " + moduleName + " module, from the repos.js file.");
             infoMsgAdv("Server has successfully removed the module.", 'end');
             resolve(true);
@@ -277,7 +279,7 @@ function removeModule(moduleName) {
 function removeModuleConfig(data) {
   return new Promise(function (resolve) {
       var parsedResponse = "";
-      writeFile(data, "test.js").then(function (response) {
+      writeFile(data, configPath).then(function (response) {
         parsedResponse = ("Successfully removed the module from config.js");
         infoMsgAdv(parsedResponse, 'end');
         resolve(parsedResponse);
@@ -317,13 +319,13 @@ function updateModule(moduleName) {
 
 function evalRepos() {
   try {
-    eval(fs.readFileSync('repos.js')+'');
+    eval(fs.readFileSync(reposPath)+'');
     repositories = reposits;
     evaled = true;
   } catch (err) {
     errorMsg("Failed to evaluate the file repos.js. \n   This only fails if repos.js is not in a valid JavaScript syntax. \n   To make things work again, try setting var reposits = {}; in repos.js");
     content = "var reposits = {};";
-    writeFile(content, "repos.js");
+    writeFile(content, reposPath);
     evaled = false;
   } 
 }

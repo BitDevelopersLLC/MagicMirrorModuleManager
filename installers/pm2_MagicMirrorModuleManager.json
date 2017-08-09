@@ -1,0 +1,7 @@
+{
+  "apps" : [{
+    "name"        : "MagicMirrorModuleManager",
+    "script"      : "/home/pi/MagicMirrorModuleManager/installers/start.sh",
+    "watch"       : ["/home/pi/MagicMirrorModuleManager/config/repos.js"]
+  }]
+}
