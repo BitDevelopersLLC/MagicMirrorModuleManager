@@ -349,7 +349,7 @@
       </section>
     </main>
   </div>
-<script src="config/test.js"></script>
+<script src="../MagicMirror/config/config.js"></script>
 <script src="socket.io.js"> </script>
 <script type="text/javascript">
 <!--
@@ -396,7 +396,6 @@ if (screen.width >= 699) {
 
   var dialogInfo = { page: 1 };
 
-  // IMPORTANT: YOU NEED TO MAKE THIS NON-HARD CODED
   var socketURL = ("http://" + window.location.hostname + ":" + window.location.port);
   var socket = io(socketURL, {transports: ['websocket', 'polling', 'flashsocket']});
 
