@@ -327,7 +327,7 @@
              </div>
 
              <div  class="demo-grid-ruler mdl-grid">
-                <div id="pos-lower_center" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored mdl-cell mdl-cell--3-col mdl-cell--9-col-tablet">Lower Center</div>
+                <div id="pos-lower_third" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored mdl-cell mdl-cell--3-col mdl-cell--9-col-tablet">Lower Third</div>
               </div>
 
              <div  class="demo-grid-2 mdl-grid">
@@ -561,7 +561,7 @@ if (screen.width >= 699) {
         * @returns {Array} allPositions - Returns all possible module positions minus the one's taken.
         */
         function positionsNotTaken() {
-          var allPositions = ["top_bar", "bottom_bar", "top_left", "bottom_left", "top_right", "bottom_right", "top_center", "bottom_center", "upper_third", "middle_center", "lower_center"];
+          var allPositions = ["top_bar", "bottom_bar", "top_left", "bottom_left", "top_right", "bottom_right", "top_center", "bottom_center", "upper_third", "middle_center", "lower_third"];
 
           for (pos in mapModulePositions) {
             for (var i=allPositions.length-1; i>=0; i--) {
@@ -1223,7 +1223,7 @@ if (screen.width >= 699) {
         * @dependency {JavaScript} mdl - The Material Design Lite package by Google.
         */
         function setupPositionTab() {
-          var allPositions = ["top_bar", "bottom_bar", "top_left", "bottom_left", "top_right", "bottom_right", "top_center", "bottom_center", "upper_third", "middle_center", "lower_center"];
+          var allPositions = ["top_bar", "bottom_bar", "top_left", "bottom_left", "top_right", "bottom_right", "top_center", "bottom_center", "upper_third", "middle_center", "lower_third"];
 
           // NOTE: For each position in allPositions do, the following.
           for (pos in allPositions) {
