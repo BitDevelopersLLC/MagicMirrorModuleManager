@@ -1,11 +1,11 @@
-var repositories = 
+var reposits = 
 {
-	"MMM-bergfex": {
-		"url": "https://github.com/nebulx29/MMM-bergfex",
-		"hash": "c5b3a8acbfebb690c79f00fdfddd4220dc19ceb0"
-	},
 	"MagicMirrorConfigurator": {
 		"url": "https://github.com/EliteByte/MagicMirrorConfigurator",
-		"hash": "790f547f7e382e8303de854f4a32d357ca2bf7be"
+		"hash": "0224a741ad0c4a1e3c06c1f344b8df462f9d70e5"
+	},
+	"MMM-bitcoin": {
+		"url": "https://github.com/valmassoi/MMM-bitcoin",
+		"hash": "f9b7ad18d56d72c92f577cf8c6ba51d6a8877ddb"
 	}
 }

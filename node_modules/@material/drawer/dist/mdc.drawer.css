@@ -96,7 +96,7 @@
  * ```
  *
  * You can also pass a 4th optional $root-selector argument which will be forwarded to `mdc-rtl`,
- * e.g. `@include mdc-rtl-reflexive-box-property(margin, left, 8px, ".mdc-component")`.
+ * e.g. `@include mdc-rtl-reflexive-box(margin, left, 8px, ".mdc-component")`.
  *
  * Note that this function will always zero out the original value in an RTL context. If you're
  * trying to flip the values, use mdc-rtl-reflexive-property().
@@ -410,7 +410,7 @@
  * ```
  *
  * You can also pass a 4th optional $root-selector argument which will be forwarded to `mdc-rtl`,
- * e.g. `@include mdc-rtl-reflexive-box-property(margin, left, 8px, ".mdc-component")`.
+ * e.g. `@include mdc-rtl-reflexive-box(margin, left, 8px, ".mdc-component")`.
  *
  * Note that this function will always zero out the original value in an RTL context. If you're
  * trying to flip the values, use mdc-rtl-reflexive-property().
@@ -565,6 +565,7 @@
       color: rgba(255, 255, 255, 0.54); }
   .mdc-persistent-drawer--selected.mdc-list-item,
   .mdc-persistent-drawer--selected.mdc-list-item .mdc-list-item__start-detail {
+    /* @alternate */
     color: #3f51b5;
     color: var(--mdc-theme-primary, #3f51b5); }
   .mdc-persistent-drawer .mdc-list-item::before {
@@ -573,8 +574,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    -webkit-transition: opacity 120ms 0ms cubic-bezier(0.4, 0, 1, 1);
-    transition: opacity 120ms 0ms cubic-bezier(0.4, 0, 1, 1);
+    -webkit-transition: opacity 120ms 0ms cubic-bezier(0.4, 0, 0.6, 1);
+    transition: opacity 120ms 0ms cubic-bezier(0.4, 0, 0.6, 1);
     border-radius: inherit;
     background: currentColor;
     content: "";
@@ -596,6 +597,7 @@
     -webkit-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
             transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
   .mdc-persistent-drawer__drawer {
+    /* @alternate */
     background: #fff;
     background: var(--mdc-theme-background, #fff);
     border-left: 0;
@@ -631,6 +633,7 @@
     .mdc-theme--dark .mdc-persistent-drawer__drawer {
       background-color: #212121;
       background-color: var(--mdc-persistent-drawer-dark-theme-bg-color, #212121);
+      /* @alternate */
       color: white;
       color: var(--mdc-theme-text-primary-on-dark, white);
       border-left: 0;
@@ -647,15 +650,15 @@
       -webkit-transform: translateX(calc(100% + 20px));
               transform: translateX(calc(100% + 20px)); }
   .mdc-persistent-drawer--animating .mdc-persistent-drawer__drawer {
-    -webkit-transition: -webkit-transform 0.13s 0ms cubic-bezier(0, 0, 0.2, 1);
-    transition: -webkit-transform 0.13s 0ms cubic-bezier(0, 0, 0.2, 1);
-    transition: transform 0.13s 0ms cubic-bezier(0, 0, 0.2, 1);
-    transition: transform 0.13s 0ms cubic-bezier(0, 0, 0.2, 1), -webkit-transform 0.13s 0ms cubic-bezier(0, 0, 0.2, 1); }
+    -webkit-transition: -webkit-transform 0.195s 0ms cubic-bezier(0.4, 0, 0.6, 1);
+    transition: -webkit-transform 0.195s 0ms cubic-bezier(0.4, 0, 0.6, 1);
+    transition: transform 0.195s 0ms cubic-bezier(0.4, 0, 0.6, 1);
+    transition: transform 0.195s 0ms cubic-bezier(0.4, 0, 0.6, 1), -webkit-transform 0.195s 0ms cubic-bezier(0.4, 0, 0.6, 1); }
   .mdc-persistent-drawer--animating.mdc-persistent-drawer--open .mdc-persistent-drawer__drawer {
-    -webkit-transition: -webkit-transform 0.33s 0ms cubic-bezier(0, 0, 0.2, 1);
-    transition: -webkit-transform 0.33s 0ms cubic-bezier(0, 0, 0.2, 1);
-    transition: transform 0.33s 0ms cubic-bezier(0, 0, 0.2, 1);
-    transition: transform 0.33s 0ms cubic-bezier(0, 0, 0.2, 1), -webkit-transform 0.33s 0ms cubic-bezier(0, 0, 0.2, 1); }
+    -webkit-transition: -webkit-transform 0.225s 0ms cubic-bezier(0, 0, 0.2, 1);
+    transition: -webkit-transform 0.225s 0ms cubic-bezier(0, 0, 0.2, 1);
+    transition: transform 0.225s 0ms cubic-bezier(0, 0, 0.2, 1);
+    transition: transform 0.225s 0ms cubic-bezier(0, 0, 0.2, 1), -webkit-transform 0.225s 0ms cubic-bezier(0, 0, 0.2, 1); }
   .mdc-persistent-drawer--open {
     width: 240px;
     pointer-events: auto; }
@@ -759,7 +762,7 @@
  * ```
  *
  * You can also pass a 4th optional $root-selector argument which will be forwarded to `mdc-rtl`,
- * e.g. `@include mdc-rtl-reflexive-box-property(margin, left, 8px, ".mdc-component")`.
+ * e.g. `@include mdc-rtl-reflexive-box(margin, left, 8px, ".mdc-component")`.
  *
  * Note that this function will always zero out the original value in an RTL context. If you're
  * trying to flip the values, use mdc-rtl-reflexive-property().
@@ -973,6 +976,7 @@
   /* stylelint-disable selector-no-qualifying-type */
   /* stylelint-enable selector-no-qualifying-type */
   /* TODO(sgomes): Revisit when we have interactive lists. */
+  /* @alternate */
   background: #fff;
   background: var(--mdc-theme-background, #fff);
   border-left: 0;
@@ -1066,6 +1070,7 @@
       color: rgba(255, 255, 255, 0.54); }
   .mdc-permanent-drawer--selected.mdc-list-item,
   .mdc-permanent-drawer--selected.mdc-list-item .mdc-list-item__start-detail {
+    /* @alternate */
     color: #3f51b5;
     color: var(--mdc-theme-primary, #3f51b5); }
   .mdc-permanent-drawer .mdc-list-item::before {
@@ -1074,8 +1079,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    -webkit-transition: opacity 120ms 0ms cubic-bezier(0.4, 0, 1, 1);
-    transition: opacity 120ms 0ms cubic-bezier(0.4, 0, 1, 1);
+    -webkit-transition: opacity 120ms 0ms cubic-bezier(0.4, 0, 0.6, 1);
+    transition: opacity 120ms 0ms cubic-bezier(0.4, 0, 0.6, 1);
     border-radius: inherit;
     background: currentColor;
     content: "";
@@ -1106,6 +1111,7 @@
   .mdc-theme--dark .mdc-permanent-drawer {
     background-color: #212121;
     background-color: var(--mdc-permanent-drawer-dark-theme-bg-color, #212121);
+    /* @alternate */
     color: white;
     color: var(--mdc-theme-text-primary-on-dark, white);
     border-left: 0;
@@ -1258,7 +1264,7 @@
  * ```
  *
  * You can also pass a 4th optional $root-selector argument which will be forwarded to `mdc-rtl`,
- * e.g. `@include mdc-rtl-reflexive-box-property(margin, left, 8px, ".mdc-component")`.
+ * e.g. `@include mdc-rtl-reflexive-box(margin, left, 8px, ".mdc-component")`.
  *
  * Note that this function will always zero out the original value in an RTL context. If you're
  * trying to flip the values, use mdc-rtl-reflexive-property().
@@ -1572,7 +1578,7 @@
  * ```
  *
  * You can also pass a 4th optional $root-selector argument which will be forwarded to `mdc-rtl`,
- * e.g. `@include mdc-rtl-reflexive-box-property(margin, left, 8px, ".mdc-component")`.
+ * e.g. `@include mdc-rtl-reflexive-box(margin, left, 8px, ".mdc-component")`.
  *
  * Note that this function will always zero out the original value in an RTL context. If you're
  * trying to flip the values, use mdc-rtl-reflexive-property().
@@ -1660,7 +1666,7 @@
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
   contain: strict;
-  z-index: 3;
+  z-index: 5;
   /* Shaded background */ }
   .mdc-temporary-drawer__toolbar-spacer {
     display: -webkit-box;
@@ -1735,6 +1741,7 @@
       color: rgba(255, 255, 255, 0.54); }
   .mdc-temporary-drawer--selected.mdc-list-item,
   .mdc-temporary-drawer--selected.mdc-list-item .mdc-list-item__start-detail {
+    /* @alternate */
     color: #3f51b5;
     color: var(--mdc-theme-primary, #3f51b5); }
   .mdc-temporary-drawer .mdc-list-item::before {
@@ -1743,8 +1750,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    -webkit-transition: opacity 120ms 0ms cubic-bezier(0.4, 0, 1, 1);
-    transition: opacity 120ms 0ms cubic-bezier(0.4, 0, 1, 1);
+    -webkit-transition: opacity 120ms 0ms cubic-bezier(0.4, 0, 0.6, 1);
+    transition: opacity 120ms 0ms cubic-bezier(0.4, 0, 0.6, 1);
     border-radius: inherit;
     background: currentColor;
     content: "";
@@ -1780,6 +1787,7 @@
     -webkit-box-sizing: border-box;
             box-sizing: border-box; }
   .mdc-temporary-drawer__drawer {
+    /* @alternate */
     background: #fff;
     background: var(--mdc-theme-background, #fff);
     -webkit-box-shadow: 0px 8px 10px -5px rgba(0, 0, 0, 0.2), 0px 16px 24px 2px rgba(0, 0, 0, 0.14), 0px 6px 30px 5px rgba(0, 0, 0, 0.12);
@@ -1814,6 +1822,7 @@
     .mdc-temporary-drawer--theme-dark .mdc-temporary-drawer__drawer,
     .mdc-theme--dark .mdc-temporary-drawer__drawer {
       background: #303030;
+      /* @alternate */
       color: white;
       color: var(--mdc-theme-text-primary-on-dark, white); }
     [dir="rtl"] .mdc-temporary-drawer .mdc-temporary-drawer__drawer,
@@ -1847,15 +1856,15 @@
     -webkit-transition: opacity 0.3s 0ms cubic-bezier(0, 0, 0.2, 1);
     transition: opacity 0.3s 0ms cubic-bezier(0, 0, 0.2, 1); }
   .mdc-temporary-drawer--animating.mdc-temporary-drawer--open .mdc-temporary-drawer__drawer {
-    -webkit-transition: -webkit-transform 0.33s 0ms cubic-bezier(0, 0, 0.2, 1);
-    transition: -webkit-transform 0.33s 0ms cubic-bezier(0, 0, 0.2, 1);
-    transition: transform 0.33s 0ms cubic-bezier(0, 0, 0.2, 1);
-    transition: transform 0.33s 0ms cubic-bezier(0, 0, 0.2, 1), -webkit-transform 0.33s 0ms cubic-bezier(0, 0, 0.2, 1); }
+    -webkit-transition: -webkit-transform 0.225s 0ms cubic-bezier(0, 0, 0.2, 1);
+    transition: -webkit-transform 0.225s 0ms cubic-bezier(0, 0, 0.2, 1);
+    transition: transform 0.225s 0ms cubic-bezier(0, 0, 0.2, 1);
+    transition: transform 0.225s 0ms cubic-bezier(0, 0, 0.2, 1), -webkit-transform 0.225s 0ms cubic-bezier(0, 0, 0.2, 1); }
   .mdc-temporary-drawer--animating .mdc-temporary-drawer__drawer {
-    -webkit-transition: -webkit-transform 0.13s 0ms cubic-bezier(0, 0, 0.2, 1);
-    transition: -webkit-transform 0.13s 0ms cubic-bezier(0, 0, 0.2, 1);
-    transition: transform 0.13s 0ms cubic-bezier(0, 0, 0.2, 1);
-    transition: transform 0.13s 0ms cubic-bezier(0, 0, 0.2, 1), -webkit-transform 0.13s 0ms cubic-bezier(0, 0, 0.2, 1); }
+    -webkit-transition: -webkit-transform 0.195s 0ms cubic-bezier(0.4, 0, 0.6, 1);
+    transition: -webkit-transform 0.195s 0ms cubic-bezier(0.4, 0, 0.6, 1);
+    transition: transform 0.195s 0ms cubic-bezier(0.4, 0, 0.6, 1);
+    transition: transform 0.195s 0ms cubic-bezier(0.4, 0, 0.6, 1), -webkit-transform 0.195s 0ms cubic-bezier(0.4, 0, 0.6, 1); }
   .mdc-temporary-drawer--open {
     pointer-events: auto; }
     .mdc-temporary-drawer--open::before {

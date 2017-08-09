@@ -39,7 +39,7 @@ var config = {
 			"position": "top_right",
 			"config": {
 				"units": "imperial",
-				"location": "Ladera Ranch",
+				"location": "California",
 				"locationID": "5364199",
 				"appid": "0d8cbd2c42f528549ddb896767e82809"
 			}
@@ -70,36 +70,12 @@ var config = {
 			}
 		},
 		{
-			"module": "MMM-awesome-alexa",
-			"position": "bottom_bar",
-			"config": {
-				"wakeWord": "Alexa",
-				"clientId": "YOUR_CLIENT_ID",
-				"clientSecret": "YOUR_CLIENT_SECRET",
-				"deviceId": "YOUR_DEVICE_ID",
-				"refreshToken": "YOUR_REFRESH_TOKEN",
-				"lite": false
-			}
-		},
-		{
-			"module": "MMM-bergfex",
+			"module": "MMM-bitcoin",
 			"position": "top_right",
-			"classes": "small dimmed",
 			"config": {
-				"updateInterval": 1800000,
-				"animationSpeed": 0,
-				"header": "bergfex.at Snow Report",
-				"skiareas": [
-					"Gerlos - Zillertal Arena",
-					"Hauser Kaibling / Schladming - Ski amade",
-					"Hochkar",
-					"Hochkönig / Maria Alm - Dienten - Mühlbach - Ski amade",
-					"Klippitztörl",
-					"Koralpe"
-				],
-				"shortenArea": 20,
-				"cssclassrow": "normal",
-				"cssclassheader": "bright"
+				"fiat": "usd",
+				"showBefore": "foo",
+				"updateInterval": 60000
 			}
 		}
 	]

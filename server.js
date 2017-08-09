@@ -1,21 +1,21 @@
 var url = require('url');
 var fs = require('fs');
-var rimraf = require('rimraf');
+var rimraf = require('rimraf-promise');
 var path = require('path');
 var qrcode = require('qrcode-terminal');
-var googl = require('goo.gl');
 
 // NOTE: GitHub Handling Dependencies
-var git = require("nodegit");
+var git = require("git-clone");
 var gitParse = require("git-url-parse");
-var gitCommits = require('git-commits');
-var gitLSCommit = require('git-ls-remote');
+var gitLast = require('git-last-commit');
+var repoCommits = [];
 var gitBusy = true;
 
 
 // NOTE: For communication between server and client.
 var app = require('http').createServer(handler, {ssl: 'true'})
 var io = require('socket.io')(app);
+var serverSocket = null;
 
 // NOTE: For IP Address.
 var os = require('os');
@@ -26,9 +26,14 @@ var ifaces = os.networkInterfaces();
 var port = 1984;
 var modulesDirectory = "modules";
 
+
+// NOTE: Server variables (Dynamic).
+var repositories = null;
+var evaled = false;
+
+
 // NOTE: Pre-Initialization Statements
 app.listen(port);
-googl.setKey('AIzaSyBW-vcSOh3izzGSgSxG-_YDOQ_bIyaRYg8');
 
 function handler (request, response) {
   //console.log('request ', request.url);
@@ -106,150 +111,306 @@ function getIP() {
   return ipAddress;
 }
 
+function emitMessage(id, data) {
+  serverSocket.emit(id, data);
+}
 
-function repoHandle(handleType, reposit) {
-  var content = "var repositories = ";
+function repoHandle(handleType, repo) {
+  return new Promise( function (resolve, reject) {
 
+    evalRepos();
+
+    if (evaled) {
+      var parsedRepo = null;
+      var parsedDirectory = null;
+      var repoPath = null;
+      var repoHash = null;
+
+      switch (handleType) {
+
+        case "pull":
+
+        break;
+
+        case "clone":
+          parsedRepo = gitParse(String(repo));
+          parsedDirectory = (modulesDirectory + "/" + parsedRepo.name);
+
+          startCloneRepo(repo, parsedDirectory, parsedRepo.name).then(function (response) {
+            resolve(response);
+          }, function (error) {
+            reject(error);
+          });      
+        break;
+
+        default:
+          var errString = ("Function repoHandle() was called with a invalid handleType = " + handleType);
+          reject(errString);
+          errorMsg(errString);
+      }
+    }
+  });
+}
+
+function startCloneRepo(repoURL, repoPath, repoName) {
+  return new Promise(function (resolve, reject) {
+      gitBusy = true;
+      git(repoURL, repoPath, function (err) {
+        if (err) {
+          if (err == "Error: 'git clone' failed with status 128") {
+            infoMsgAdv("Clone request was denied because module has already been downloaded previously.", "end");
+            gitBusy = false;
+            resolve(true);
+            return true;
+          } else {
+            var parsedError = ("Server failed to clone the module, " + repoName + " GitHub Repository. Details -> \n" + err);
+            errorMsg(parsedError);
+            gitBusy = parsedError;
+            return false;
+          }
+        } else {
+          infoMsg("Server successfully cloned the module, " + repoName + " GitHub Repository.");
+          finishCloneRepo(repoURL, repoPath, repoName).then(function (finishResponse) {
+            gitBusy = false;
+            resolve(true);
+            return true;
+          });
+        }
+      });
+  });
+}
+
+function finishCloneRepo(repoURL, repoPath, repoName) {
+  var contentDynamic = repositories;
+  var content = "var reposits = ";
+
+  return new Promise(function (resolve, reject) {
+    getLastCommit(repoName).then(function (commitResponse) {
+      infoMsg("Server successfully obtained the cloned module's latest hash which will be used for versioning.");
+      contentDynamic[repoName] = { url: repoURL, hash: commitResponse.hash };
+
+      if (contentDynamic != null) {
+          content += ("\n" + JSON.stringify(contentDynamic, null, "\t"));
+          writeFile(content, "repos.js").then(function (writeResponse) {
+            infoMsg("Server has written info about the, " + repoName + " module, to the repos.js file.");
+            resolve(true);
+          }, function (error) {
+            var parsedError = ("Failed to write the module in repos.js file. Details -> " + error);
+            errorMsg(parsedError);
+            gitBusy = parsedError;
+            reject(parsedError);
+          });
+        }
+    });
+  });
+}
+
+function getLastCommit(moduleName) {
+  return new Promise(function (resolve, reject) {
+      gitLast.getLastCommit(function(err, commit) {
+        if (err) {
+          errorMsg(err); 
+          reject(Error(err));
+        } else {
+          resolve(commit);
+        }
+      }, {dst: (modulesDirectory + "/" + moduleName)});
+  });
+}
+
+function writeFile(content, fileName) {
+  return new Promise(function (resolve, reject) {
+    fs.writeFile(fileName, content, function(err) {
+      if (err) {
+          reject(Error(err));
+      } else {
+        resolve(fileName);
+      }
+    });
+  });
+}
+
+function configUpdate(data) {
+  return new Promise(function (resolve, reject) { 
+    var parsedResponse = "";
+
+    writeFile(data, "test.js").then(function (response) {
+      parsedResponse = ("Update has finished saving client data.");
+      infoMsgAdv(parsedResponse, 'end');
+      resolve(true);
+    }, function (error) {
+      parsedResponse = ("Update failed to save client data to " + response);
+      errorMsg("An error occured while saving a client update to the file " + response + "\nDetails -> " + error);
+      infoMsgAdv(parsedResponse, 'end');
+      reject(false);
+    });
+  });
+}
+
+function removeModule(moduleName) {
+  var modulePath = (modulesDirectory + "/" + moduleName);
+  return new Promise(function (resolve, reject) {
+    rimraf(modulePath).then(function () {
+
+      evalRepos();
+      var contentDynamic = repositories;
+      var content = "var reposits = ";
+
+      if (evaled) {
+        delete contentDynamic[moduleName];
+        content += ("\n" + JSON.stringify(contentDynamic, null, "\t"));
+        writeFile(content, "repos.js").then(function (writeResponse) {
+            infoMsg("Server has removed info about the, " + moduleName + " module, from the repos.js file.");
+            infoMsgAdv("Server has successfully removed the module.", 'end');
+            resolve(true);
+          }, function (error) {
+            var parsedError = ("Failed to write the module in repos.js file. Details -> " + error);
+            errorMsg(parsedError);
+            gitBusy = parsedError;
+            reject(error);
+          });
+      }
+    });
+  });
+}
+
+function removeModuleConfig(data) {
+  return new Promise(function (resolve) {
+      var parsedResponse = "";
+      writeFile(data, "test.js").then(function (response) {
+        parsedResponse = ("Successfully removed the module from config.js");
+        infoMsgAdv(parsedResponse, 'end');
+        resolve(parsedResponse);
+      }, function (error) {
+        errorMsg("An error occured while removing a module's config from the " + response + " file.\nDetails -> " + error);
+        infoMsgAdv('Failed to remove module config', 'end');
+        reject(error);
+      });
+  });
+}
+
+
+// NOTE: Deprecated, needs to be less force-update and more check-update.
+function updateModule(moduleName) {
+  var modulePath = (modulesDirectory + "/" + moduleName);
+  evalRepos();
+
+  return new Promise(function (resolve) {
+    rimraf(modulePath).then(function () {
+      if (evaled) {
+        var moduleURL = repositories.moduleName.url;
+
+        startCloneRepo(moduleURL, modulePath, moduleName).then(function (response) {
+          if (response == true) {
+            resolve(true);
+          } else { 
+            reject(response);
+          }
+        });
+      } 
+      else {
+        reject("Repos.js file couldn't be evaluated. Fix the syntax.");
+      }
+    });
+  });
+}
+
+function evalRepos() {
   try {
     eval(fs.readFileSync('repos.js')+'');
+    repositories = reposits;
+    evaled = true;
   } catch (err) {
-    console.error("[Error] Failed to evaluate the file repos.js. \n   This only fails if repos.js is not a valid JavaScript syntax. \n   To make things work again, try setting var repositories = {}; in repos.js");
-    gitBusy = err;
-    content = "var repositories = {};";
-    writeFileRepo(content);
-    return;    
+    errorMsg("Failed to evaluate the file repos.js. \n   This only fails if repos.js is not in a valid JavaScript syntax. \n   To make things work again, try setting var reposits = {}; in repos.js");
+    content = "var reposits = {};";
+    writeFile(content, "repos.js");
+    evaled = false;
   } 
+}
 
-  var contentDynamic = repositories;
+function errorMsg(msg) {
+  console.error('\x1b[31m', "  [Error]", '\x1b[37m', msg, '\x1b[0m');
+}
 
+function infoMsg(msg) {
+  console.log('\x1b[36m', "  [Info]", '\x1b[37m' + msg, '\x1b[0m');
+}
 
-  var parsedRepo = null;
-  var parsedDirectory = null;
-  var repoPath = null;
-  var repoHash = null;
-
-  switch (handleType) {
-
-    case "pull":
-
-      parsedDirectory = (modulesDirectory + "/" + reposit);
-      repoPath = path.resolve(parsedDirectory + '/.git');
-
-      rimraf(parsedDirectory, function () {
-        console.log("[Info] Module, " + reposit + " has been removed for updating.");
-      });
-
-      cloneRepo(repositories[reposit].url, parsedDirectory);
-
-      gitLSCommit.head(reposit, function(err, result) {
-        if (err) { 
-          console.error("[Error] Retrieval of module's hash failed, so we are unable to retrive the module. \nA module's hash is used for versioning.");
-          gitBusy = err;
-          throw err;
-        } else { 
-          repoHash = result;
-          contentDynamic[reposit].hash = repoHash;
-
-          if (contentDynamic) {
-            content += ("\n" + JSON.stringify(contentDynamic, null, "\t"));
-            writeFileRepo(content);
-          }
-        }
-      });
-
-    break;
-
-    case "clone":
-
-      parsedRepo = gitParse(String(reposit));
-      parsedDirectory = (modulesDirectory + "/" + parsedRepo.name);
-      repoPath = path.resolve(parsedDirectory + '/.git');
-
-      gitBusy = true;
-      cloneRepo(reposit, parsedDirectory);
-
-      gitLSCommit.head(reposit, function(err, result) {
-        if (err) { 
-          console.error("[Error] Retrieval of module's hash failed, so we are unable to retrive the module. \nA module's hash is used for versioning.");
-          gitBusy = err;
-        throw err;
-        } else { 
-          repoHash = result;
-          contentDynamic[parsedRepo.name] = { url: reposit, hash: repoHash };
-          if (contentDynamic != null) {
-            content += ("\n" + JSON.stringify(contentDynamic, null, "\t"));
-            writeFileRepo(content);
-          }
-        }
-      });
-    break;
-
-    default:
-      console.error("[Error] Function repoHandle() was called with a invalid handleType = " + handleType);
-
+function infoMsgAdv(msg, opt) {
+  if (opt == "start") {
+    console.log('\n' + '\x1b[36m' + "[Info]", '\x1b[37m' + '\x1b[32m' + '\x1b[4m' + "[Start]" + '\x1b[0m', '\x1b[37m' + msg, '\x1b[0m');
+  } else if (opt == "end") {
+    console.log('\x1b[36m' + "[Info]", '\x1b[37m' + '\x1b[31m' + '\x1b[4m' + "[End]" + '\x1b[0m', '\x1b[37m' + msg, '\x1b[0m');
   }
 }
 
-repoHandle('clone', 'https://github.com/EliteByte/MagicMirrorConfigurator');
-
-
-
-function cloneRepo(repoURL, repoName) {
-  git.Clone(repoURL, repoName).then(function(repository) {
-    console.log("[Info] Server successfully cloned the module, " + repoName + " GitHub Repository");
-    gitBusy = false;
-    return;
-  });
-}
-
-
-function writeFile(content) {
-
-  fs.writeFile("test.js", content, function(err) {
-    if(err) {
-        return console.log(err);
-    }
-    console.log("The file was saved!");
-  });
-}
-
-function writeFileRepo(content) {
-
-    fs.writeFile("repos.js", content, function(err) {
-    if (err) {
-      console.error("[Error] Saving to repos.js Failed - > ", err);
-    } else {
-      console.log("[Info] Push to repos.js Succeeded.");
-    }
-  });
-}
-
-
 // NOTE: Post-Initialization Statements.
-// console.log("Type in the link to open Module Manager.\n" +
-//   'http://' + getIP() + ':1984' + "\nOr scan the QR code to be redirected.");
-// qrcode.generate('http://' + getIP() + ':1984', {small: true});
-// console.log("P.S. iOS 11 Camera App now auto detects QR.");
+console.log("Type in the link to open Module Manager.\n" +
+  'http://' + getIP() + ':1984' + "\nOr scan the QR code to be redirected.");
+qrcode.generate('http://' + getIP() + ':1984', {small: true});
+console.log("P.S. iOS 11 Camera App now auto detects QR.");
 
 io.on('connection', function (socket) {
 
-  socket.on('configUpdate', function (data) {
-    console.log("[Info] [Start] A client has pushed an update to the Config.js file.");
-    writeFile(data);
+  serverSocket = socket;
+
+  socket.on('configUpdate', function (data, fn) {
+    infoMsgAdv("A client has pushed an update to the Config.js file.", 'start');
+    configUpdate(data).then(function (response) {
+        fn(true);
+      }, function (error) {
+        fn(error);
+      });
   });
 
   socket.on('pull', function (data) {
-    console.log('[Info] [Start] A client has pushed a gitHubRepo "pull" request.');
+    infoMsgAdv('A client has pushed a gitHubRepo "pull" request.', 'start');
     repoHandle(data.type, data.repo);
   });
 
-  socket.on('clone', function (data) {
-    console.log('[Info] [Start] A client has pushed a gitHubRepo "clone" request.');
-    repoHandle(data.type, data.repo);
+  socket.on('clone', function (data, fn) {
+    infoMsgAdv('A client has pushed a gitHubRepo "clone" request.', 'start');
+    repoHandle(data.type, data.repo).then(function (response) {
+        infoMsgAdv("Server has successfully cloned and setup the module.", 'end');
+        fn(true);
+      }, function (error) {
+        fn(error);
+      });
   });
 
+  // NOTE: Deprecated, will be removed soon.
   socket.on('gitBusy', function () {
       socket.emit('gitBusyResponse', gitBusy);
+  });
+
+  socket.on('removeModuleConfig', function(data, fn) {
+    infoMsgAdv('A client has requested the removal of a module config.', 'start');
+    removeModuleConfig(data).then(function (response) {
+        fn(true);
+      }, function (error) {
+        fn(error);
+      });
+  });
+
+  socket.on('removeModule', function (data, fn) {
+    var parsedString = ('A client has requested the deletion of the module, ' + data.moduleName + '.');
+    infoMsgAdv(parsedString, 'start');
+    removeModule(data.moduleName).then(function (response) {
+        fn(true);
+      }, function (error) {
+        fn(error);
+      });
+  })
+
+  socket.on('updateModule', function(data, fn) {
+    var parsedString = ('A client has requested to update the module, ' + data.module + '.');
+    infoMsgAdv(parsedString, 'start');
+    updateModule(data.module).then(function (response) {
+      infoMsgAdv("Server has successfully updated the module.", 'end');
+        fn(true);
+      }, function (error) {
+        fn(error);
+      });
   });
 
 });

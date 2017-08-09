@@ -252,7 +252,7 @@
                 </li>
               </ul>
 
-              <div class="mdl-card__actions mdl-card--border">
+            <div class="mdl-card__actions mdl-card--border">
               </div>
 
               <button id="updateButton" align="center" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onclick="updateConfig()">
@@ -270,6 +270,25 @@
                   for="positionButton">
                 </ul>
                 <!-- End Position Button -->
+
+                <!-- Remove Module Button - Top Right -->
+                <div class="mdl-card__menu" style="margin-right: 35px; ">
+                  <button id="removeButton"
+                          class="mdl-button mdl-js-button mdl-button--icon" onclick="removeModule()">
+                    <i class="material-icons">remove_circle_outline</i>
+                  </button>
+                </div>
+                <!-- End Remove Module Button -->
+
+                <!-- Update Module Button - Top Right -->
+                <div class="mdl-card__menu" style="margin-right: 70px; ">
+                  <button id="removeButton"
+                          class="mdl-button mdl-js-button mdl-button--icon" onclick="updateModule()">
+                    <i class="material-icons">update</i>
+                  </button>
+                </div>
+                <!-- End Update Module Button -->
+
           </div>
 
           <div id="tab-2" class="mdl-js-snackbar mdl-snackbar">
@@ -288,7 +307,6 @@
           <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect update-positions-button" onclick="updateConfigPositions()">
             Update
           </button>
-
 
           <div  class="demo-grid-ruler mdl-grid">
               <div id="pos-top_bar" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored mdl-cell mdl-cell--3-col">Top Bar</div>
@@ -558,58 +576,101 @@ if (screen.width >= 699) {
 
 
         function sendOutData(data) {
+          return new Promise( function (resolve, reject) {
+            socket.emit('configUpdate', data, function (response) {
+              resolve(response);
+              return response;
+            });
+          }, function (error) {
+            console.error("Error emiting data through socket. -> [ " + error + " ]");
+            return false;
+          });
           try {
-            socket.emit('configUpdate', data);
+
+          } catch (err) {
+
+          }
+        }
+
+        function removeModule() {
+          var moduleName = currentModule.module;
+
+          try {
+            var removedConfig = config;
+            var index = removedConfig.modules.indexOf(currentModule);
+            removedConfig.modules.splice(index, 1);
+
+            var data = ("var config = " + JSON.stringify(removedConfig, null, "\t") + ";" + "\n if (typeof module !== 'undefined') {module.exports = config;}");
+            socket.emit('removeModuleConfig', data, function (confirmation) {
+              if (confirmation == true) {
+                console.log("Successfully removed " + moduleName + "'s entry from config.js \nMoving onto removing it from the server's version management system. (repos.js)");
+
+                socket.emit('removeModule', { 'moduleName': moduleName }, function (secondConfirmation) {
+                  if (secondConfirmation == true) {
+                    console.log("Successfully finished all existence of " + moduleName);
+                    location.reload();
+                    flushHash();
+                  } else {
+                    console.error("Failed removing module from repos.js. \nDetails from server -> " + secondConfirmation);
+                  }
+                });
+              } else {
+                console.error("Failed removing module from config.js. \nDetails from server -> " + secondConfirmation);
+              }
+            });
+
             return true;
           } catch (err) {
-            console.error("Error emiting data through socket. -> [ " + err + " ]");
+            console.error("Failed removing module " + moduleName + " \nDetails -> " + err);
             return false;
           }
         }
 
         function sendOutGitHubRequest(requestType, repoURL) {
-        
-          switch (requestType) {
-            case "clone":
-              socket.emit('clone', { type: 'clone', repo: repoURL });
-
-              if (isGitBusy()) {
-                console.error("GitHub just returned with an error when making a request. \n Please check the server's console for more informaiton.");
-                  return true;
-              } else {
-                console.log("GitHub is no longer busy");
-                return false;
-              }
-              break;
-            case "pull":
-              socket.emit('pull', { type: 'pull', repo: repoURL });
-              break;
-            default:
-              console.error("[Error] Function, sendOutGitHubRequest() failed. \n Caused by an unknown requestType -> " + requestType);
-          }
-          return true;
+          return new Promise(function (resolve, reject) {
+            switch (requestType) {
+              case "clone":
+                socket.emit('clone', { type: 'clone', repo: repoURL }, function (response) {
+                  if (response == true) {
+                    resolve(response);
+                  } else {
+                    reject(response);
+                    console.error(response);
+                    snackBar(("Failed cloning the module with error: " + response), 1);
+                  }
+                });
+                
+                break;
+              case "pull":
+                socket.emit('pull', { type: 'pull', repo: repoURL });
+                break;
+              default:
+                console.error("[Error] Function, sendOutGitHubRequest() failed. \n Caused by an unknown requestType -> " + requestType);
+            }
+            return true;
+          });
         }
 
-        function isGitBusy() {
-          socket.emit('gitBusy', function () {  
-            socket.on('gitBusyReponse', function (response) {
-              console.error("Response : " + response);
+        function updateModule() {
+          return new Promise(function (resolve, reject) {
+            socket.emit('updateModule', { module: currentModule.module }, function (response) {
               if (response == true) {
-                // NOTE GitHub Request Still Unfinished
-                setTimeout(function () {
-                  isGitBusy();
-                }, 200);
-              } else if (reponse == true) {
-                // NOTE: GitHub Request Finished
-                return false;
+                console.info("Successfully updated module, " + currentModule.module + ".");
+                snackBar(("Successfully updated module, " + currentModule.module + "."), 2);
+                resolve(true);
               } else {
-                return true;
-                // Note GitHub Request Failed with error = response
-                console.error("Function sendOutGitHubRequest(clone) failed with a server-side error ->  \n" + response);
+                console.error("Error after emiting updateModule to server. \nDetails -> " + response);
+                reject(response);
+                return response;
               }
             });
           });
         }
+
+        function flushHash() {
+          window.location.hash = "";
+        }
+
 
     /**
     * End of, Utility Functions
@@ -763,27 +824,35 @@ if (screen.width >= 699) {
             break;
 
             case 3:
-              //change this after dev work
-              var configSentOut = true;
 
-              // try {
-              //   configSentOut = sendOutData(parseConfigData(dialogInfo.config));
-              // } catch (err) {
-              //   console.error("[Error] Data sent to config has failed. Parsed config may be invalid. Caught Error -> " + "[ " + err + " ]");
-              //   snackBar("Error sending out data to config. Double check your pasted config. ");
-              //   alert(err);
-              // }
+              sendOutData(parseConfigData(dialogInfo.config)).then(function (response) {
+                if (response == true) {
+                  console.log("Successfully added new module to the config.js");
+                  sendOutGitHubRequest('clone', dialogInfo.url).then(function (response) {
+                    if (response == true) {
+                      // NOTE: Set URL hash to module's name i.e. (localhost:1984/#calendar)
+                      var href = window.location.href;
+                      var moduleIndex = (config.modules.length - 1);
 
-              if (configSentOut) {
-                try {
-                  sendOutGitHubRequest('clone', dialogInfo.url);
-                  //location.reload();
-                } catch (error) {
-                  console.error("[Error] GitHub Clone Request to download module to Mirror has failed. Check your MagicMirror console. Caught Error -> " + err);
-                  snackBar("Error sending out GitHub Clone request to server. Check Pi's console. ");
-                  alert(error);
+                      if (href.indexOf("#") > 0) {
+                        href = href.split("#")[0] + "?var=1#" + href.split("#")[1];
+                        window.location.hash = '';
+                      }
+                      location.hash = ("#" + config.modules[moduleIndex].module);
+                      location.reload();
+                    } else {
+                    console.error("[Error] GitHub Clone Request to download module to Mirror has failed. Check your MagicMirror console. Caught Error -> " + response);
+                    snackBar(("Error sending out GitHub Clone request to server. Check Pi's console. "), 1);
+                    alert(response);
+                    }
+                  });            
+                } else {
+                  console.error("[Error] Data sent to config has failed. Parsed config may be invalid. \nDetails -> " + response);
+                  snackBar(("Error sending out data to config. Double check your pasted config. "), 1);
+                  alert(response);
                 }
-              }
+              });
+            
             break;
 
             default:
@@ -793,13 +862,24 @@ if (screen.width >= 699) {
         }
 
         function parseConfigData(text) {
-          var cfg = eval('('+text+')' );
+          var substringed = text.substring(0, 7);
+          var cfg = null;
 
-          fullDynamicConfig.modules[fullDynamicConfig.modules.length] = cfg;
+          if (substringed == "modules") {
+            cfg = eval(text);
+            fullDynamicConfig.modules[fullDynamicConfig.modules.length] = cfg[0];
+          } else {
+            cfg = eval('('+text+')');
+            fullDynamicConfig.modules[fullDynamicConfig.modules.length] = cfg;
+          }
 
           var data = ("var config = " + JSON.stringify(fullDynamicConfig, null, "\t") + ";" + "\n if (typeof module !== 'undefined') {module.exports = config;}");
           return data;
         }
+
+        // var string = "modules: [ { module: 'MMM-bitcoin', position: 'top_right', config: { fiat: 'usd', showBefore: 'foo', updateInterval: 60000 } }, ]";
+
+        // eval('(')
 
 
     /**
@@ -857,7 +937,7 @@ if (screen.width >= 699) {
                 input.type = "text"
                 input.id = cfg;
                 li.onkeyup = function() {
-                  updateToggle(this);
+                  buttonToggle("updateButton");
                 }
                 var label = document.createElement("label");
                 label.className = "mdl-textfield__label";
@@ -1077,13 +1157,13 @@ if (screen.width >= 699) {
         }
 
         /** OPTIMIZE FOR VERSATILTIY
-        * Update Toggle - Enable or Disable a button depending on if their are changes or not. [v0.1]
+        * Button Toggle - Enable or Disable a button depending on if their are changes or not. [v0.1]
         *
         * @param {String} element - The element that will be affected.
         * @child {Function} checkConfigCardInputs() - Child function essential for updateToggle().
         */
         function buttonToggle(element) {
-          var updateButton = document.getElementById("updateButton");
+          var updateButton = document.getElementById(element);
 
           // NOTE: Child function responsible for the checks.
           checkConfigCardInputs();
