@@ -348,8 +348,8 @@ function infoMsgAdv(msg, opt) {
 
 // NOTE: Post-Initialization Statements.
 console.log("Type in the link to open Module Manager.\n" +
-  'http://' + getIP() + ':1984' + "\nOr scan the QR code to be redirected.");
-qrcode.generate('http://' + getIP() + ':1984', {small: true});
+  'http://' + getIP() + ':' + port + "\nOr scan the QR code to be redirected.");
+qrcode.generate('http://' + getIP() + ':' + port, {small: true});
 console.log("P.S. iOS 11 Camera App now auto detects QR.");
 
 io.on('connection', function (socket) {
