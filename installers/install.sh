@@ -120,6 +120,7 @@ if [[ $choice =~ ^[Yy]$ ]]; then
     sudo npm install -g pm2
     sudo su -c "env PATH=$PATH:/usr/bin pm2 startup linux -u pi --hp /home/pi"
     pm2 start ~/MagicMirrorModuleManager/installers/pm2_MagicMirrorModuleManager.json
+    sudo pm2 startup systemd -u pi --hp /home/pi
     pm2 save
 fi
 
