@@ -359,7 +359,7 @@ function infoMsgAdv(msg, opt) {
 }
 
 function executeCommand(cmd) {
-  return new Promsie( function (resolve, reject) {
+  return new Promise( function (resolve, reject) {
     exec(cmd, (err, stdout, stderr) => {
       if (err) {
         reject(err);
