@@ -5,6 +5,7 @@
   "main": "server.js",
   "dependencies": {
     "@material/grid-list": "^0.2.5",
+    "child_process": "^1.0.2",
     "fs": "0.0.1-security",
     "git-clone": "^0.1.0",
     "git-last-commit": "^0.3.0",

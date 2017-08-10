@@ -3,6 +3,7 @@ var fs = require('fs');
 var rimraf = require('rimraf-promise');
 var path = require('path');
 var qrcode = require('qrcode-terminal');
+var exec = require('child_process')
 
 // NOTE: GitHub Handling Dependencies
 var git = require("git-clone");
@@ -357,6 +358,17 @@ function infoMsgAdv(msg, opt) {
   }
 }
 
+function executeCommand(cmd) {
+  return new Promsie( function (resolve, reject) {
+    exec(cmd, (err, stdout, stderr) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+    });
+  });
+}
+
 // NOTE: Post-Initialization Statements.
 console.log("Type in the link to open Module Manager.\n" +
   'http://' + getIP() + ':' + port + "\nOr scan the QR code to be redirected.");
@@ -370,6 +382,7 @@ io.on('connection', function (socket) {
   socket.on('configUpdate', function (data, fn) {
     infoMsgAdv("A client has pushed an update to the Config.js file.", 'start');
     configUpdate(data).then(function (response) {
+        executeCommand("pm2 restart mm");
         fn(true);
       }, function (error) {
         fn(error);
@@ -385,6 +398,7 @@ io.on('connection', function (socket) {
     infoMsgAdv('A client has pushed a gitHubRepo "clone" request.', 'start');
     repoHandle(data.type, data.repo).then(function (response) {
         infoMsgAdv("Server has successfully cloned and setup the module.", 'end');
+        executeCommand("pm2 restart mm");
         fn(true);
       }, function (error) {
         fn(error);
@@ -409,6 +423,7 @@ io.on('connection', function (socket) {
     var parsedString = ('A client has requested the deletion of the module, ' + data.moduleName + '.');
     infoMsgAdv(parsedString, 'start');
     removeModule(data.moduleName).then(function (response) {
+        executeCommand("pm2 restart mm");
         fn(true);
       }, function (error) {
         fn(error);
@@ -420,6 +435,7 @@ io.on('connection', function (socket) {
     infoMsgAdv(parsedString, 'start');
     updateModule(data.module).then(function (response) {
       infoMsgAdv("Server has successfully updated the module.", 'end');
+        executeCommand("pm2 restart mm");
         fn(true);
       }, function (error) {
         fn(error);
