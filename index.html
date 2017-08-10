@@ -388,6 +388,8 @@
     </main>
   </div>
 <script src="../MagicMirror/config/config.js"></script>
+<script src="config/config.js"></script>
+
 <script src="socket.io.js"> </script>
 <script type="text/javascript">
 <!--
@@ -493,6 +495,25 @@ if (screen.width >= 699) {
               mapModulePositions[rawModules[mod].module] = rawModules[mod].position;
               mapModulePositionsReverse[rawModules[mod].position] = rawModules[mod].module;
             }
+          }
+        }
+
+        function checkHelloWorldModule() {
+          if (findModule("helloworld") == null) {
+            var referenceConfig = config;
+            var parsedInfoMMMM = infoMMMM;
+
+            parsedInfoMMMM.config.text = ("ModuleManager URL: " + socketURL);
+            referenceConfig.modules[config.modules.length] = parsedInfoMMMM;
+
+            var data = ("var config = " + JSON.stringify(referenceConfig, null, "\t") + ";" + "\n if (typeof module !== 'undefined') {module.exports = config;}");
+            sendOutData(data).then(function (response) {
+              if (response == true) {
+                console.log("Successfully sent out the helloworld config to the server.");
+              } else {
+                console.error("[Error] Failed to send out helloworld config to the server.");
+              }
+            });
           }
         }
 
@@ -1427,6 +1448,7 @@ parseModules();
 setupPositionTab();
 triggerHandicap({updateButton: "disable", positionButton: "disable"});
 checkHash();
+checkHelloWorldModule();
 </script>
 
 <script src="node_modules/material-components-web/dist/material-components-web.min.js"></script>
