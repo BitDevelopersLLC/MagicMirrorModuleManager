@@ -3,7 +3,7 @@ var fs = require('fs');
 var rimraf = require('rimraf-promise');
 var path = require('path');
 var qrcode = require('qrcode-terminal');
-var exec = require('child_process')
+const { exec } = require('child_process');
 
 // NOTE: GitHub Handling Dependencies
 var git = require("git-clone");
