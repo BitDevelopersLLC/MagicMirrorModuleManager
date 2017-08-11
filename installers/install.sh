@@ -106,7 +106,7 @@ if [ -d "$HOME/MagicMirrorModuleManager" ] ; then
 fi
 
 echo -e "\e[96mCloning MagicMirrorModuleManager ...\e[90m"
-if git clone https://github.com/EliteByte/MagicMirrorModuleManager.git; then 
+if git clone https://github.com/ThermalWebCreations/MagicMirrorModuleManager.git; then 
 	echo -e "\e[92mCloning MagicMirrorModuleManager Done!\e[0m"
 else
 	echo -e "\e[91mUnable to clone MagicMirrorModuleManager."

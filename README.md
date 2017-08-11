@@ -22,7 +22,7 @@ bash -c "$(curl -sL https://raw.githubusercontent.com/ThermalWebCreations/MagicM
 ### Manual Installation
 
 1. Download and install the latest [MagicMirror²](https://github.com/MichMich/MagicMirror#usage)
-2. Clone the repository and check out the master branch: `git clone https://github.com/EliteByte/MagicMirrorModuleManager`
+2. Clone the repository and check out the master branch: `git clone https://github.com/ThermalWebCreations/MagicMirrorModuleManager`
 3. Enter the repository: `cd ~/MagicMirrorModuleManager`
 4. Install and run the app: `npm install && npm start`
 
