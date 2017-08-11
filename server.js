@@ -39,13 +39,13 @@ var evaled = false;
 try {
   app.listen(port);
 } catch (err) {
-  errorMsg("Failed starting server because the port has been taken. \nDetails -> " + err);
+  errorMsg("Failed starting the server... \nDetails -> " + err);
   return;
 }
 
+
+
 function handler (request, response) {
-
-
   var filePath = '.' + request.url;
   if (filePath == './')
     filePath = './index.html';

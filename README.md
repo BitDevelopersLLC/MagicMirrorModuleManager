@@ -16,7 +16,7 @@
 
 Execute the following command on your Raspberry Pi to install MagicMirrorModuleManager:
 ````
-bash -c "$(curl -sL https://raw.githubusercontent.com/EliteByte/MagicMirrorModuleManager/master/installers/install.sh)"
+bash -c "$(curl -sL https://raw.githubusercontent.com/ThermalWebCreations/MagicMirrorModuleManager/master/installers/install.sh)"
 ````
 
 ### Manual Installation

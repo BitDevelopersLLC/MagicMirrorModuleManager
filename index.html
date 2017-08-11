@@ -122,6 +122,11 @@
   margin-top: 5px;
 }
 
+.mdl-menu__container {
+  right: auto!important;
+  bottom: auto!important;
+}
+
 
   #sortable1, #sortable2, #sortable3 {
     border: 1px solid #eee;
@@ -498,6 +503,7 @@ if (screen.width >= 699) {
           }
         }
 
+
         function checkHelloWorldModule() {
           if (findModule("helloworld") == null) {
             var referenceConfig = config;
@@ -516,7 +522,6 @@ if (screen.width >= 699) {
             });
           }
         }
-
     /**
     * End of, Pre-Initialization Functions
     */
@@ -753,47 +758,53 @@ if (screen.width >= 699) {
 
           // NOTE: Go through all rawModules and add them to the module list.
           for (mod in rawModules) {
-            var li = document.createElement("li");
-            var btn = document.createElement("button");
-            li.appendChild(btn);
-            li.className = "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored";
-            li.innerHTML = rawModules[mod].module;
-            li.style = "cursor:pointer";
-            li.style.fontSize = "15px";
-            li.style.width = buttonWidthSync;
-            li.style.textAlign = "center";
-            arrayModules.push(rawModules[mod].module);
-            arryNumber = arryNumber + 1;
-            li.id = arryNumber;
+            
+            if (rawModules[mod].module != "alert") {
+              if (rawModules[mod].module != "helloworld") {
 
-            li.addEventListener('click', function(e) {
-              for (li in this.parentNode.childNodes) {
-                if (this.parentNode.childNodes[li].tagName == 'LI') {
-                  // NOTE: Reset all module's color to (unselected) blue.
-                  this.parentNode.childNodes[li].style.backgroundColor = "#3b5bb4";
-                }
+                var li = document.createElement("li");
+                var btn = document.createElement("button");
+                li.appendChild(btn);
+                li.className = "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored";
+                li.innerHTML = rawModules[mod].module;
+                li.style = "cursor:pointer";
+                li.style.fontSize = "15px";
+                li.style.width = buttonWidthSync;
+                li.style.textAlign = "center";
+                arrayModules.push(rawModules[mod].module);
+                arryNumber = arryNumber + 1;
+                li.id = arryNumber;
+
+                li.addEventListener('click', function(e) {
+                  for (li in this.parentNode.childNodes) {
+                    if (this.parentNode.childNodes[li].tagName == 'LI') {
+                      // NOTE: Reset all module's color to (unselected) blue.
+                      this.parentNode.childNodes[li].style.backgroundColor = "#3b5bb4";
+                    }
+                  }
+                  // NOTE: Set selected module to pink.
+                  this.style.backgroundColor = "#ec4174";
+                  var targetName = arrayModules[this.id];
+
+                  // NOTE: Set URL hash to module's name i.e. (localhost:1984/#calendar)
+                  var href = window.location.href;
+                  if (href.indexOf("#") > 0) {
+                    href = href.split("#")[0] + "?var=1#" + href.split("#")[1];
+                    window.location.hash = '';
+                  }
+                  location.hash = ("#" + targetName);
+
+                  // NOTE: Clear all previous config items in Config-Tab, using jQuery.
+                  $("li[id=configItem]").remove();
+
+                  // NOTE: After 20ms populateConfigCard() and click on the Config-Tab.
+                  setTimeout(function () { populateConfigCard(findModule(targetName));
+                  document.getElementById("secondTab").click();}, 20);
+                });
+
+                ul.appendChild(li);
               }
-              // NOTE: Set selected module to pink.
-              this.style.backgroundColor = "#ec4174";
-              var targetName = arrayModules[this.id];
-
-              // NOTE: Set URL hash to module's name i.e. (localhost:1984/#calendar)
-              var href = window.location.href;
-              if (href.indexOf("#") > 0) {
-                href = href.split("#")[0] + "?var=1#" + href.split("#")[1];
-                window.location.hash = '';
-              }
-              location.hash = ("#" + targetName);
-
-              // NOTE: Clear all previous config items in Config-Tab, using jQuery.
-              $("li[id=configItem]").remove();
-
-              // NOTE: After 20ms populateConfigCard() and click on the Config-Tab.
-              setTimeout(function () { populateConfigCard(findModule(targetName));
-              document.getElementById("secondTab").click();}, 20);
-            });
-
-            ul.appendChild(li);
+            }
           }
         }
 
@@ -1276,15 +1287,6 @@ if (screen.width >= 699) {
     * @function {Void} [v0.1] updateConfigPositions() - Loops through all takenPositionsDynamic and sets them to their respectiv emodule in the fullDynamicConfig for publishing.
     */
 
-    // <button id="menu-speed" class="mdl-button mdl-js-button mdl-button--icon">
-    //   <i class="material-icons">more_vert</i>
-    // </button>
-    // <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect" for="menu-speed">
-    //   <li class="mdl-menu__item">Fast</li>
-    //   <li class="mdl-menu__item">Medium</li>
-    //   <li class="mdl-menu__item">Slow</li>
-    // </ul>
-
         /**
         * Setup Position Tab - Populate and set up the Positions-Tab with all positions. [v0.1]
         *
@@ -1301,6 +1303,9 @@ if (screen.width >= 699) {
             var listItem = document.createElement("li");
             listItem.innerHTML = "Test";
             listItem.className = "mdl-menu__item";
+
+            positionList.style.right = "auto";
+            positionList.style.bottom = "auto";
 
             positionList.appendChild(listItem);
 
@@ -1447,8 +1452,8 @@ handleDialogue();
 parseModules();
 setupPositionTab();
 triggerHandicap({updateButton: "disable", positionButton: "disable"});
-checkHash();
 checkHelloWorldModule();
+checkHash();
 </script>
 
 <script src="node_modules/material-components-web/dist/material-components-web.min.js"></script>
